@@ -1,9 +1,8 @@
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QComboBox, QWidget
-from typing import Tuple, Union
 
 class ComboBox(QComboBox):
-    def __init__(self, items: Union[Tuple[str], None] = None, parent: Union[QWidget, None] = None):
+    def __init__(self, items: tuple[str] | None = None, parent: QWidget | None = None):
         super().__init__(parent)
         if items:
             self.addItems(items)

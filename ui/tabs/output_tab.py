@@ -234,21 +234,22 @@ class OutputTab(QWidget):
 
     def _setToolTipsDynamic(self):
         """Sets tooltips. Their content can change."""
-        if self.format_cmb.currentText() == "JPEG XL":
-            setToolTip("lossless_jpeg_xl", self.lossless_cb)
-            setToolTip("effort", self.effort_sb)
-            setToolTip("quality_jpeg_xl", self.quality_sl, self.quality_sb)
-        elif self.format_cmb.currentText() == "AVIF":
-            setToolTip("speed", self.effort_sb)
-            setToolTip("quality_avif", self.quality_sl, self.quality_sb)
-        elif self.format_cmb.currentText() == "WebP":
-            setToolTip("method", self.effort_sb)
-            setToolTip("quality_webp", self.quality_sl, self.quality_sb)
-            setToolTip("lossless", self.lossless_cb)
-        elif self.format_cmb.currentText() == "JPEG":
-            setToolTip("quality_jpeg", self.quality_sl, self.quality_sb)
-        elif self.format_cmb.currentText() == "Lossless JPEG Transcoding":
-            setToolTip("effort_jpeg_recomp", self.effort_sb)
+        match self.format_cmb.currentText():
+            case "JPEG XL":
+                setToolTip("lossless_jpeg_xl", self.lossless_cb)
+                setToolTip("effort", self.effort_sb)
+                setToolTip("quality_jpeg_xl", self.quality_sl, self.quality_sb)
+            case "AVIF":
+                setToolTip("speed", self.effort_sb)
+                setToolTip("quality_avif", self.quality_sl, self.quality_sb)
+            case "WebP":
+                setToolTip("method", self.effort_sb)
+                setToolTip("quality_webp", self.quality_sl, self.quality_sb)
+                setToolTip("lossless", self.lossless_cb)
+            case "JPEG":
+                setToolTip("quality_jpeg", self.quality_sl, self.quality_sb)
+            case "Lossless JPEG Transcoding":
+                setToolTip("effort_jpeg_recomp", self.effort_sb)
 
     # //////////////////////////////////////////////////////////
     # /                      Getters
@@ -438,19 +439,20 @@ class OutputTab(QWidget):
         self.wm.cleanVars()
         cur_format = self.format_cmb.currentText()
 
-        if cur_format == "AVIF":
-            self.quality_sl.setValue(70)
-            self.effort_sb.setValue(6)
-        elif cur_format == "JPEG XL":
-            self.quality_sl.setValue(80)
-            self.effort_sb.setValue(7)
-        elif cur_format == "JPEG":
-            self.quality_sl.setValue(90)
-        elif cur_format == "WebP":
-            self.quality_sl.setValue(90)
-            self.effort_sb.setValue(6)
-        elif cur_format == "Lossless JPEG Transcoding":
-            self.effort_sb.setValue(7)
+        match cur_format:
+            case "AVIF":
+                self.quality_sl.setValue(70)
+                self.effort_sb.setValue(6)
+            case "JPEG XL":
+                self.quality_sl.setValue(80)
+                self.effort_sb.setValue(7)
+            case "JPEG":
+                self.quality_sl.setValue(90)
+            case "WebP":
+                self.quality_sl.setValue(90)
+                self.effort_sb.setValue(6)
+            case "Lossless JPEG Transcoding":
+                self.effort_sb.setValue(7)
         
         self.int_effort_cb.setChecked(False)
         self.jxl_modular_cb.setChecked(False)
@@ -491,39 +493,41 @@ class OutputTab(QWidget):
         if self.prev_format == None:
             return
 
-        if self.prev_format == "JPEG XL":
-            self.wm.setVar("jxl_quality", self.quality_sl.value())
-            self.wm.setVar("jxl_effort", self.effort_sb.value())
-            self.wm.setVar("jxl_int_effort", self.int_effort_cb.isChecked())
-            self.wm.setVar("jxl_lossless", self.lossless_cb.isChecked())
-        elif self.prev_format == "AVIF":
-            self.wm.setVar("avif_quality", self.quality_sl.value())
-            self.wm.setVar("avif_speed", self.effort_sb.value())
-        elif self.prev_format == "WebP":
-            self.wm.setVar("webp_quality", self.quality_sl.value())
-            self.wm.setVar("webp_effort", self.effort_sb.value())
-            self.wm.setVar("webp_lossless", self.lossless_cb.isChecked())
-        elif self.prev_format == "JPEG":
-            self.wm.setVar("jpg_quality", self.quality_sl.value())
-        elif self.prev_format == "Lossless JPEG Transcoding":
-            self.wm.setVar("jxl_lossless_jpeg_effort", self.effort_sb.value())
+        match self.prev_format:
+            case "JPEG XL":
+                self.wm.setVar("jxl_quality", self.quality_sl.value())
+                self.wm.setVar("jxl_effort", self.effort_sb.value())
+                self.wm.setVar("jxl_int_effort", self.int_effort_cb.isChecked())
+                self.wm.setVar("jxl_lossless", self.lossless_cb.isChecked())
+            case "AVIF":
+                self.wm.setVar("avif_quality", self.quality_sl.value())
+                self.wm.setVar("avif_speed", self.effort_sb.value())
+            case "WebP":
+                self.wm.setVar("webp_quality", self.quality_sl.value())
+                self.wm.setVar("webp_effort", self.effort_sb.value())
+                self.wm.setVar("webp_lossless", self.lossless_cb.isChecked())
+            case "JPEG":
+                self.wm.setVar("jpg_quality", self.quality_sl.value())
+            case "Lossless JPEG Transcoding":
+                self.wm.setVar("jxl_lossless_jpeg_effort", self.effort_sb.value())
 
     def _loadFormatVars(self):
-        if self.prev_format == "JPEG XL":
-            self.wm.applyVar("jxl_quality", "quality_sl", 80)
-            self.wm.applyVar("jxl_effort", "effort_sb", 7)
-            self.wm.applyVar("jxl_lossless", "lossless_cb", False)
-        elif self.prev_format == "AVIF":
-            self.wm.applyVar("avif_quality", "quality_sl", 70)
-            self.wm.applyVar("avif_speed", "effort_sb", 6)
-        elif self.prev_format == "WebP":
-            self.wm.applyVar("webp_quality", "quality_sl", 90)
-            self.wm.applyVar("webp_effort", "effort_sb", 6)
-            self.wm.applyVar("webp_lossless", "lossless_cb", False)
-        elif self.prev_format == "JPEG":
-            self.wm.applyVar("jpg_quality", "quality_sl", 90)
-        elif self.prev_format == "Lossless JPEG Transcoding":
-            self.wm.applyVar("jxl_lossless_jpeg_effort", "effort_sb", 7)
+        match self.prev_format:
+            case "JPEG XL":
+                self.wm.applyVar("jxl_quality", "quality_sl", 80)
+                self.wm.applyVar("jxl_effort", "effort_sb", 7)
+                self.wm.applyVar("jxl_lossless", "lossless_cb", False)
+            case "AVIF":
+                self.wm.applyVar("avif_quality", "quality_sl", 70)
+                self.wm.applyVar("avif_speed", "effort_sb", 6)
+            case "WebP":
+                self.wm.applyVar("webp_quality", "quality_sl", 90)
+                self.wm.applyVar("webp_effort", "effort_sb", 6)
+                self.wm.applyVar("webp_lossless", "lossless_cb", False)
+            case "JPEG":
+                self.wm.applyVar("jpg_quality", "quality_sl", 90)
+            case "Lossless JPEG Transcoding":
+                self.wm.applyVar("jxl_lossless_jpeg_effort", "effort_sb", 7)
 
     def saveState(self, new_states: Optional[Dict] = None) -> None:
         if new_states is None or new_states != self.cached_states:

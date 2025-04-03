@@ -65,7 +65,10 @@ def test_transcodeJPEGtoJPEGXL_source_missing(transcodeJPEGtoJPEGXL_patches):
 
 def test_normalizeJPEG_happy_path():
     src, dst = "/path/src.jpg", "/path/dst.jpg"
-    with patch("core.lossless_jpeg.os.path.isfile", return_value=True) as mock_isfile,        patch("core.lossless_jpeg.runJPEGtran", return_value=("stdout", "stderr")) as mock_runJPEGtran:
+    with (
+        patch("core.lossless_jpeg.os.path.isfile", return_value=True) as mock_isfile,
+        patch("core.lossless_jpeg.runJPEGtran", return_value=("stdout", "stderr")) as mock_runJPEGtran,
+    ):
         assert (True, "stdout", "stderr") == lossless_jpeg.normalizeJPEG(src, dst)
 
     mock_runJPEGtran.assert_called_once_with(
@@ -79,7 +82,10 @@ def test_normalizeJPEG_happy_path():
 
 def test_normalizeJPEG_missing_output():
     src, dst = "/path/src.jpg", "/path/dst.jpg"
-    with patch("core.lossless_jpeg.os.path.isfile", side_effect=(True, False)) as mock_isfile,        patch("core.lossless_jpeg.runJPEGtran", return_value=("stdout", "stderr")) as mock_runJPEGtran:
+    with (
+        patch("core.lossless_jpeg.os.path.isfile", side_effect=(True, False)) as mock_isfile,
+        patch("core.lossless_jpeg.runJPEGtran", return_value=("stdout", "stderr")) as mock_runJPEGtran,
+    ):
         assert (False, "stdout", "stderr") == lossless_jpeg.normalizeJPEG(src, dst)
 
     mock_runJPEGtran.assert_called_once_with(
@@ -93,7 +99,10 @@ def test_normalizeJPEG_missing_output():
 
 def test_normalizeJPEG_missing_source():
     src, dst = "/path/src.jpg", "/path/dst.jpg"
-    with patch("core.lossless_jpeg.os.path.isfile", side_effect=(False, False)) as mock_isfile,        patch("core.lossless_jpeg.runJPEGtran", return_value=("stdout", "stderr")) as mock_runJPEGtran:
+    with (
+        patch("core.lossless_jpeg.os.path.isfile", side_effect=(False, False)) as mock_isfile,
+        patch("core.lossless_jpeg.runJPEGtran", return_value=("stdout", "stderr")) as mock_runJPEGtran,
+    ):
         assert (False, "", "Source file not found.") == lossless_jpeg.normalizeJPEG(src, dst)
 
     mock_runJPEGtran.assert_not_called()
@@ -161,7 +170,11 @@ def test_verifyJPEGXLReconstructionData_checksum_mismatch(verifyJPEGXLReconstruc
 
 def test_reconstructJPEGfromJPEGXL_happy_path():
     src, dst = "/path/src.jpg", "/path/dst.jpg"
-    with patch("core.lossless_jpeg.DJXL_PATH", "djxl") as var_DJXL_PATH,        patch("core.lossless_jpeg.os.path.isfile", return_value=True) as mock_isfile,        patch("core.lossless_jpeg.runBinary", return_value=("stdout", "stderr")) as mock_runBinary:
+    with (
+        patch("core.lossless_jpeg.DJXL_PATH", "djxl") as var_DJXL_PATH,
+        patch("core.lossless_jpeg.os.path.isfile", return_value=True) as mock_isfile,
+        patch("core.lossless_jpeg.runBinary", return_value=("stdout", "stderr")) as mock_runBinary,
+    ):
         assert (True, "stdout", "stderr") == lossless_jpeg.reconstructJPEGfromJPEGXL(src, dst, 4)
 
     mock_runBinary.assert_called_once_with(
@@ -173,7 +186,11 @@ def test_reconstructJPEGfromJPEGXL_happy_path():
 
 def test_reconstructJPEGfromJPEGXL_missing_source():
     src, dst = "/path/src.jpg", "/path/dst.jpg"
-    with patch("core.lossless_jpeg.DJXL_PATH", "djxl") as var_DJXL_PATH,        patch("core.lossless_jpeg.os.path.isfile", return_value=False) as mock_isfile,        patch("core.lossless_jpeg.runBinary", return_value=("stdout", "stderr")) as mock_runBinary:
+    with (
+        patch("core.lossless_jpeg.DJXL_PATH", "djxl") as var_DJXL_PATH,
+        patch("core.lossless_jpeg.os.path.isfile", return_value=False) as mock_isfile,
+        patch("core.lossless_jpeg.runBinary", return_value=("stdout", "stderr")) as mock_runBinary,
+    ):
         assert (False, "", "Source file not found.") == lossless_jpeg.reconstructJPEGfromJPEGXL(src, dst, 4)
 
     mock_runBinary.mock_runBinary()

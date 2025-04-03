@@ -1,6 +1,6 @@
 import logging
 from dataclasses import dataclass
-from typing import List, Literal, Optional
+from typing import Literal, Optional
 import os
 import re
 
@@ -21,7 +21,7 @@ class RAMOptimizer:
     _instance: Optional["RAMOptimizer"] = None
     enabled: bool = False
     used_thread_count: Optional[int] = None
-    rules: List[OptimizationRule] = []
+    rules: list[OptimizationRule] = []
 
     def __new__(cls):
         if cls._instance is None:
@@ -48,11 +48,11 @@ class RAMOptimizer:
         cls.used_thread_count = used_thread_count
 
     @classmethod
-    def setOptimizationRules(cls, rules: List[OptimizationRule]) -> None:
+    def setOptimizationRules(cls, rules: list[OptimizationRule]) -> None:
         cls.rules = rules
 
     @staticmethod
-    def parseOptimizationRules(rules_str: str) -> List[OptimizationRule]:
+    def parseOptimizationRules(rules_str: str) -> list[OptimizationRule]:
         VALID_SCOPES = {"all", "JPEG XL", "SVT-AV1-PSY"}
         rules = []
         for re_match in re.finditer(r'\("([^"]+)",\s*(\d+(?:\.\d+)?),\s*"([1-9]+\/[1-9]+|1)"\)', rules_str):

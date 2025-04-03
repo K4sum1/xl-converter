@@ -17,13 +17,12 @@ from data.constants import (
 )
 from core.process import runProcess, runProcessOutput
 from core.exceptions import GenericException, FileException
-from typing import List
 
 class Data:
     exiftool_available = None   # None - unchecked; False - not available; True - available;
     exiftool_err_msg = ""
 
-def runExifTool(src: str, dst: str, et_args: List[str]) -> None:
+def runExifTool(src: str, dst: str, et_args: list[str]) -> None:
     """Runs ExifTool.
 
     Args:
@@ -41,10 +40,11 @@ def runExifTool(src: str, dst: str, et_args: List[str]) -> None:
     # Prepare args
     cmd = et_args
     for idx, val in enumerate(cmd):
-        if val == "$src":
-            cmd[idx] = src
-        elif val == "$dst":
-            cmd[idx] = dst
+        match val:
+            case "$src":
+                cmd[idx] = src
+            case "$dst":
+                cmd[idx] = dst
     
     # Run
     _runExifTool(*cmd)
@@ -93,19 +93,20 @@ def isExifToolAvailable(mutex: QMutex) -> (bool, str):
             return (Data.exiftool_available, Data.exiftool_err_msg)
 
         # Perform check
-        if platform.system() == "Linux":
-            Data.exiftool_available = not "not found" in runProcessOutput("bash", "-c", "type exiftool")[1]
-            if Data.exiftool_available == False:
-                Data.exiftool_err_msg = "ExifTool not found. Please install ExifTool on your system and restart the program."
-        elif platform.system() == "Windows":
-            proc_output = runProcessOutput(EXIFTOOL_PATH, "-ver")
-            if proc_output[0].strip() == "" or "assertion failed" in proc_output[1]:
-                Data.exiftool_available = False
-                Data.exiftool_err_msg = "Please reinstall this program in a location without special characters to use ExifTool."
-            else:
+        match platform.system():
+            case "Linux":
+                Data.exiftool_available = not "not found" in runProcessOutput("bash", "-c", "type exiftool")[1]
+                if Data.exiftool_available == False:
+                    Data.exiftool_err_msg = "ExifTool not found. Please install ExifTool on your system and restart the program."
+            case "Windows":
+                proc_output = runProcessOutput(EXIFTOOL_PATH, "-ver")
+                if proc_output[0].strip() == "" or "assertion failed" in proc_output[1]:
+                    Data.exiftool_available = False
+                    Data.exiftool_err_msg = "Please reinstall this program in a location without special characters to use ExifTool."
+                else:
+                    Data.exiftool_available = True
+            case _:
                 Data.exiftool_available = True
-        else:
-            Data.exiftool_available = True
    
     return (Data.exiftool_available, Data.exiftool_err_msg)
         
@@ -116,21 +117,22 @@ def getArgs(encoder, mode, jpg_to_jxl_lossless=False) -> list:
         args = []
         args.extend(getArgs(encoder, mode))
     """
-    if mode == "Encoder - Wipe":
-        if encoder == CJXL_PATH:
-            if not jpg_to_jxl_lossless:
-                return ["-x strip=exif", "-x strip=xmp", "-x strip=jumbf"]
+    match mode:
+        case "Encoder - Wipe":
+            if encoder == CJXL_PATH:
+                if not jpg_to_jxl_lossless:
+                    return ["-x strip=exif", "-x strip=xmp", "-x strip=jumbf"]    
+                else:
+                    return []
+            elif encoder == IMAGE_MAGICK_PATH:
+                return ["-strip"]
+            elif encoder == AVIFENC_PATH:
+                return  ["--ignore-exif", "--ignore-xmp"]
+            elif encoder == OXIPNG_PATH:
+                return ["--strip safe"]
             else:
-                return []
-        elif encoder == IMAGE_MAGICK_PATH:
-            return ["-strip"]
-        elif encoder == AVIFENC_PATH:
-            return ["--ignore-exif", "--ignore-xmp"]
-        elif encoder == OXIPNG_PATH:
-            return ["--strip safe"]
-        else:
+                return []   # DJXL, CJPEGLI, AVIFDEC - unavailable or undocumented
+        case "Encoder - Preserve":
+            return []   # Encoders preserve metadata by default
+        case _:
             return []
-    elif mode == "Encoder - Preserve":
-        return []
-    else:
-        return []

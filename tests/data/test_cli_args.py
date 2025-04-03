@@ -48,14 +48,20 @@ def test_parseArgs_resources(arguments, is_file, is_dir, expected_args):
         assert [str(path) for path in _args.resources] == expected_args
 
 def test_getArgsLocalResQDropEvent_no_args():
-    with patch.object(sys, "argv", ["script.py"]),        patch("data.cli_args.parseArgs") as mock_parseArgs:
+    with (
+        patch.object(sys, "argv", ["script.py"]),
+        patch("data.cli_args.parseArgs") as mock_parseArgs,
+    ):
         assert cli_args.getArgsLocalResQDropEvent() is None
         mock_parseArgs.assert_not_called()
 
 def test_getArgsLocalResQDropEvent_args_present_no_res():
     mock_args = cli_args.CliArgs(resources=[])
 
-    with patch.object(sys, "argv", ["script.py", "/tmp/path"]),        patch("data.cli_args.parseArgs", return_value=mock_args) as mock_parseArgs:
+    with (
+        patch.object(sys, "argv", ["script.py", "/tmp/path"]),
+        patch("data.cli_args.parseArgs", return_value=mock_args) as mock_parseArgs,
+    ):
         assert cli_args.getArgsLocalResQDropEvent() is None
         mock_parseArgs.assert_called_once()
 
@@ -64,7 +70,10 @@ def test_getArgsLocalResQDropEvent_args_passed(app):
         resources=["/tmp/path/dir0", "/tmp/path/img.jpg"]
     )
 
-    with patch.object(sys, "argv", ["script.py"] + mock_args.resources),        patch("data.cli_args.parseArgs", return_value=mock_args) as mock_parseArgs:
+    with (
+        patch.object(sys, "argv", ["script.py"] + mock_args.resources),
+        patch("data.cli_args.parseArgs", return_value=mock_args) as mock_parseArgs,
+    ):
         drop_event = cli_args.getArgsLocalResQDropEvent()
         mock_parseArgs.assert_called_once()
 

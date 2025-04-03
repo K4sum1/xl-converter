@@ -15,7 +15,6 @@ from data.constants import (
 from core.pathing import getUniqueTmpFilePath
 from core.convert import getDecoder, runBinary
 from core.exceptions import FileException
-from typing import Union
 
 class Proxy():
     def __init__(self):
@@ -31,30 +30,31 @@ class Proxy():
             else:
                 return True
 
-        if _format == "JPEG XL":
-            if src_ext in ALLOWED_INPUT_CJXL:
-                return False
-        elif _format == "AVIF":
-            if src_ext in ALLOWED_INPUT_AVIFENC:
-                return False
-        elif _format == "WebP":
-            if src_ext in ALLOWED_INPUT_IMAGE_MAGICK:
-                return False
-        elif _format == "JPEG":
-            if jpegli:
-                if src_ext in ALLOWED_INPUT_CJPEGLI:
+        match _format:
+            case "JPEG XL":
+                if src_ext in ALLOWED_INPUT_CJXL:
+                    return False          
+            case "AVIF":
+                if src_ext in ALLOWED_INPUT_AVIFENC:
                     return False
+            case "WebP":
+                if src_ext in ALLOWED_INPUT_IMAGE_MAGICK:
+                    return False
+            case "JPEG":
+                if jpegli:
+                    if src_ext in ALLOWED_INPUT_CJPEGLI:
+                        return False
                 else:
                     if src_ext in ALLOWED_INPUT_IMAGE_MAGICK:
                         return False
-        elif _format == "Smallest Lossless":
-            return True
-        elif _format == "Lossless JPEG Transcoding":
-            return False
-        elif _format == "JPEG Reconstruction":
-            return False
-        else:
-            raise FileException("Proxy0", f"Unrecognized format ({src_ext})")
+            case "Smallest Lossless":
+                return True
+            case "Lossless JPEG Transcoding":
+                return False
+            case "JPEG Reconstruction":
+                return False
+            case _:
+                raise FileException("Proxy0", f"Unrecognized format ({src_ext})")
         
         return True
 
@@ -75,7 +75,7 @@ class Proxy():
         
         return self.proxy_path
 
-    def getPath(self) -> Union[str, None]:
+    def getPath(self) -> str | None:
         return self.proxy_path
     
     def proxyExists(self) -> bool:

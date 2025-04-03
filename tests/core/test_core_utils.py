@@ -126,7 +126,10 @@ def test_remove_happy_path():
 
 def test_remove_sad_path():
     file_path, exc_id = "/path/file.jpg", "exception_id_0"
-    with patch("core.utils.os.remove", side_effect=OSError("OSError")) as mock_remove,        pytest.raises(FileException) as excinfo:
+    with (
+        patch("core.utils.os.remove", side_effect=OSError("OSError")) as mock_remove,
+        pytest.raises(FileException) as excinfo,
+    ):
         utils.remove(file_path, exc_id=exc_id)
     
     assert exc_id == excinfo.value.id

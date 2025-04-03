@@ -70,8 +70,8 @@ class Controller(QObject):
     def checkProcessingRequirements(self,
         input_tab_item_count: int,
         sm_is_format_pool_empty: bool,
-        output_tab_settings: Dict[str, Any],
-        modify_tab_settings: Dict[str, Any],
+        output_tab_settings: dict[str, Any],
+        modify_tab_settings: dict[str, Any],
     ) -> CheckStatus:
         """Performs pre-conversion checks. Remember to parse data before."""
         output = CheckStatus()
@@ -144,9 +144,9 @@ class Controller(QObject):
         self.items.parseData(*input_tab_items)
 
     def startProcessing(self,
-        output_tab_settings: Dict[str, Any],
-        modify_tab_settings: Dict[str, Any],
-        settings_tab_settings: Dict[str, Any],
+        output_tab_settings: dict[str, Any],
+        modify_tab_settings: dict[str, Any],
+        settings_tab_settings: dict[str, Any],
         used_thread_count: int,
     ) -> None:
         """Starts the conversion."""

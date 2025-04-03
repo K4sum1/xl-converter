@@ -78,12 +78,13 @@ class Runner(QObject):
 
     def handleErrorStatusCode(self, code):
         """Handles the status code error."""
-        if code == 404:
-            self.error.emit("Version file not found.")
-        elif code == 500:
-            self.error.emit("Internal server error.")
-        else:
-            self.error.emit(f"Error, status code: {code}")
+        match code:
+            case 404:
+                self.error.emit("Version file not found.")
+            case 500:
+                self.error.emit("Internal server error.")
+            case _:
+                self.error.emit(f"Error, status code: {code}")
 
     def handleError(self, error):
         """Handles misc. errors."""

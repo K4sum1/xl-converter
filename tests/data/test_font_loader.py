@@ -12,7 +12,11 @@ def test_init_happy_path(caplog, app):
         "OpenSans-Regular.ttf",
         "OpenSans-Medium.ttf",
     ]
-    with patch("data.font_loader.QFontDatabase.addApplicationFont", return_value=1) as mock_addApplicationFont,        patch("data.font_loader.fonts", mock_fonts),        caplog.at_level(logging.ERROR):
+    with (
+        patch("data.font_loader.QFontDatabase.addApplicationFont", return_value=1) as mock_addApplicationFont,
+        patch("data.font_loader.fonts", mock_fonts),
+        caplog.at_level(logging.ERROR),
+    ):
         font_loader.init()
 
         assert mock_addApplicationFont.call_count == len(mock_fonts)
@@ -21,7 +25,11 @@ def test_init_happy_path(caplog, app):
         assert not caplog.text
 
 def test_init_sad_path(caplog, app):
-    with patch("data.font_loader.QFontDatabase.addApplicationFont", return_value=-1) as mock_addApplicationFont,        patch("data.font_loader.fonts", ["OpenSans-Light.ttf"]),        caplog.at_level(logging.ERROR):
+    with (
+        patch("data.font_loader.QFontDatabase.addApplicationFont", return_value=-1) as mock_addApplicationFont,
+        patch("data.font_loader.fonts", ["OpenSans-Light.ttf"]),
+        caplog.at_level(logging.ERROR),
+    ):
         font_loader.init()
 
         assert caplog.records[0].message == "[Fonts] Failed to load OpenSans-Light.ttf"

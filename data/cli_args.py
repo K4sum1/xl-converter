@@ -5,11 +5,10 @@ from dataclasses import dataclass
 
 from PySide6.QtCore import QMimeData, QUrl, QPointF, Qt
 from PySide6.QtGui import QDropEvent
-from typing import List, Union
 
 @dataclass
 class CliArgs:
-    resources: List[str]
+    resources: list[str]
 
 def parseArgs() -> CliArgs:
     parser = argparse.ArgumentParser()
@@ -31,7 +30,7 @@ def parseArgs() -> CliArgs:
         resources=resources
     )
 
-def getArgsLocalResQDropEvent() -> Union[QDropEvent, None]:
+def getArgsLocalResQDropEvent() -> QDropEvent | None:
     """
     Returns a QDropEvent with mimeData containing URLs to local resources, or None. Requires QApplication to exist!
 

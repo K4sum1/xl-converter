@@ -10,7 +10,6 @@ from PySide6.QtGui import QDesktopServices
 
 from core.process import runProcess
 from data.tooltips import TOOLTIPS
-from typing import Dict
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +38,7 @@ def setToolTip(tooltip: str, *widget_ids: QWidget) -> None:
             logger.error(f"Failed to apply tooltip. {e}")
 
 @contextmanager
-def _sanitizeEnviron() -> Dict[str, str]:
+def _sanitizeEnviron() -> dict[str, str]:
     """Sanitizes os.environ as a context manager."""
     keys_to_sanitize = [
         "LD_LIBRARY_PATH",

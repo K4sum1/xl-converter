@@ -1,5 +1,5 @@
 import logging
-from typing import List, Literal, Union
+from typing import Literal
 import re
 import os
 
@@ -20,11 +20,11 @@ logger = logging.getLogger(__name__)
 
 def runBinary(
     bin_path: str,
-    args: List[str],
+    args: list[str],
     src_path: str,
-    dst_path: Union[str, None] = None,
+    dst_path: str | None = None,
     args_after_input: bool = False,
-    delete_if_canceled: List[str] = [],
+    delete_if_canceled: list[str] = [],
 ) -> (str, str):
     """Replacement for convert().
 
@@ -67,7 +67,7 @@ def runBinary(
     return (stdout, stderr)
 
 def runJPEGtran(
-    args: List[str],
+    args: list[str],
     src_path: str,
     dst_path: str,
 ) -> (str, str):
@@ -119,17 +119,18 @@ def getDecoder(ext: str) -> str:
     """Return appropriate decoder path for the specified extension."""
     ext = ext.lower()   # Safeguard in case of a mistake
 
-    if ext == "png":
-        return IMAGE_MAGICK_PATH
-    elif ext == "jxl":
-        return DJXL_PATH
-    elif ext == "avif":
-        return AVIFDEC_PATH
-    else:
-        if ext in ALLOWED_INPUT_IMAGE_MAGICK:
+    match ext:
+        case "png":
             return IMAGE_MAGICK_PATH
-        else:
-            raise GenericException("C4", f"Decoder for {ext} was not found")
+        case "jxl":
+            return DJXL_PATH
+        case "avif":
+            return AVIFDEC_PATH
+        case _:
+            if ext in ALLOWED_INPUT_IMAGE_MAGICK:
+                return IMAGE_MAGICK_PATH
+            else:
+                raise GenericException("C4", f"Decoder for {ext} was not found")
 
 def getDecoderArgs(decoder_path: str, threads: int) -> list:
     if decoder_path == AVIFDEC_PATH:
@@ -190,7 +191,7 @@ def getImageCount(image_path: str) -> (int, str):
     
     return (pages_int, err)
 
-def cleanUp(file_paths: List[str]) -> None:
+def cleanUp(file_paths: list[str]) -> None:
     """Deletes file(s). Does not raise an exception."""
     for file_path in file_paths:
         if not os.path.isfile(file_path):

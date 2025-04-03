@@ -71,15 +71,16 @@ def _getThemeLightAmber() -> Theme:
     )
 
 def getTheme(theme_name: str) -> Theme:
-    if theme_name == "Ralsei":
-        return _getThemeRalsei()
+    match theme_name:
+        case "Ralsei":
+            return _getThemeRalsei()
 
-    elif theme_name == "Dark Amber":
-        return _getThemeDarkAmber()
-
-    elif theme_name == "Light Amber":
-        return _getThemeLightAmber()
-
-    else:
-        logging.getLogger(__name__).error(f"Theme \"{theme_name}\" not found")
-        return _getThemeRalsei()
+        case "Dark Amber":
+            return _getThemeDarkAmber()
+            
+        case "Light Amber":
+            return _getThemeLightAmber()
+        
+        case _:
+            logging.getLogger(__name__).error(f"Theme \"{theme_name}\" not found")
+            return _getThemeRalsei()

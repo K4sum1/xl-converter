@@ -131,7 +131,10 @@ def test_checkProcessingRequirements_active_threads_error(controller_checkProces
 def test_parseData(controller):
     items = ["item0", "item1"]
 
-    with patch.object(controller.items, "clear") as mock_clear,        patch.object(controller.items, "parseData") as mock_parseData:
+    with (
+        patch.object(controller.items, "clear") as mock_clear,
+        patch.object(controller.items, "parseData") as mock_parseData,
+    ):
         controller.parseData(items)
         mock_clear.assert_called_once()
         mock_parseData.assert_called_once_with(*items)
@@ -140,7 +143,18 @@ def test_startProcessing(controller, output_tab_settings, modify_tab_settings, s
     processing_started_spy = QSignalSpy(controller.processing_started)
     update_progress_line1_spy = QSignalSpy(controller.update_progress_line1)
 
-    with patch.object(controller.thread_manager, "configure") as mock_configure,        patch.object(controller.thread_manager, "getAvailableThreads", return_value=4),        patch("core.controller.task_status.reset") as mock_task_status_reset,        patch("core.controller.ProcessManager.clear") as mock_ProcessManager_clear,        patch("core.controller.UniquePathStore.clear") as mock_UniquePathStore_clear,        patch.object(controller.items, "getItemCount", return_value=100) as mock_getItemCount,        patch.object(controller.items, "getItem", side_effect=[(f"abs_path_{i}", f"anchor_path_{i}") for i in range(100)]),        patch("core.controller.Worker", autospec=Worker) as mock_worker,        patch.object(controller.threadpool, "start") as mock_threadpool_start,        patch.object(controller.time_left, "startCounting") as mock_startCounting:
+    with (
+        patch.object(controller.thread_manager, "configure") as mock_configure,
+        patch.object(controller.thread_manager, "getAvailableThreads", return_value=4),
+        patch("core.controller.task_status.reset") as mock_task_status_reset,
+        patch("core.controller.ProcessManager.clear") as mock_ProcessManager_clear,
+        patch("core.controller.UniquePathStore.clear") as mock_UniquePathStore_clear,
+        patch.object(controller.items, "getItemCount", return_value=100) as mock_getItemCount,
+        patch.object(controller.items, "getItem", side_effect=[(f"abs_path_{i}", f"anchor_path_{i}") for i in range(100)]),
+        patch("core.controller.Worker", autospec=Worker) as mock_worker,
+        patch.object(controller.threadpool, "start") as mock_threadpool_start,
+        patch.object(controller.time_left, "startCounting") as mock_startCounting,
+    ):
         mock_worker.return_value.signals = Mock(
             started=Mock(),
             completed=Mock(),
@@ -187,7 +201,10 @@ def test_startProcessing(controller, output_tab_settings, modify_tab_settings, s
 
 def test_finishProcessing_happy_path(controller):
     processing_finished_spy = QSignalSpy(controller.processing_finished)
-    with patch.object(controller.time_left, "stopCounting") as mock_stopCounting,        patch("core.controller.ProcessManager.clear") as mock_ProcessManager_clear:
+    with (
+        patch.object(controller.time_left, "stopCounting") as mock_stopCounting,
+        patch("core.controller.ProcessManager.clear") as mock_ProcessManager_clear,
+    ):
         controller.finishProcessing()
 
         mock_stopCounting.assert_called_once()
@@ -212,7 +229,10 @@ def test_getCompletedItemCount(controller):
         assert controller.getCompletedItemCount() == 100
 
 def test_getCompletedItemCount(controller):
-    with patch("core.controller.task_status.cancel") as mock_cancel,        patch("core.controller.ProcessManager.terminateAll") as mock_terminateAll:
+    with (
+        patch("core.controller.task_status.cancel") as mock_cancel,
+        patch("core.controller.ProcessManager.terminateAll") as mock_terminateAll,
+    ):
         controller.cancel()
         mock_cancel.assert_called_once()
         mock_terminateAll.assert_called_once()

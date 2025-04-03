@@ -163,7 +163,11 @@ def test__downscaleManualModes_no_imagemagick(params_fixture):
         "mode": "Percent",
         "percent": 50,
     })
-    with patch("core.downscale.getUniqueTmpFilePath", return_value="new/path/image.png") as mock_getUniqueTmpFilePath,        patch("core.downscale.convert") as mock_convert,        patch("core.downscale.os.remove"):
+    with (
+        patch("core.downscale.getUniqueTmpFilePath", return_value="new/path/image.png") as mock_getUniqueTmpFilePath,
+        patch("core.downscale.convert") as mock_convert,
+        patch("core.downscale.os.remove"),
+    ):
 
         downscale._downscaleManualModes(params_fixture, QMutex())
         mock_getUniqueTmpFilePath.assert_called_once_with(params_fixture["dst_dir"], "png")
@@ -183,7 +187,13 @@ def test__downscaleManualModes_no_imagemagick_jxl_int_e_e9(params_fixture, side_
         "percent": 50,
         "args": ["-q 80", "-e 7"],
     })
-    with patch("core.downscale.getUniqueTmpFilePath", side_effect=["path/to/jxl_e7.jxl", "path/to/jxl_e9.jxl"]),        patch("core.downscale.convert") as mock_convert,        patch("core.downscale.os.remove") as mock_remove,        patch("core.downscale.os.rename"),        patch("core.downscale.os.path.getsize", side_effect=side_effect):
+    with (
+        patch("core.downscale.getUniqueTmpFilePath", side_effect=["path/to/jxl_e7.jxl", "path/to/jxl_e9.jxl"]),
+        patch("core.downscale.convert") as mock_convert,
+        patch("core.downscale.os.remove") as mock_remove,
+        patch("core.downscale.os.rename"),
+        patch("core.downscale.os.path.getsize", side_effect=side_effect),
+    ):
         downscale._downscaleManualModes(params_fixture, QMutex())
         mock_convert.assert_any_call(params_fixture["enc"], "path/to/jxl_e7.jxl", params_fixture["dst"], params_fixture["args"])
         mock_remove.assert_any_call(removed_file)

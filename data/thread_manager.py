@@ -35,20 +35,20 @@ class ThreadManager:
             jpeg_xl_lossless,
             jpeg_xl_intelligent_effort
         ):
-
-            if ram_optimizer_mode == "Static":
-                single_worker_mode = True
-            elif ram_optimizer_mode == "Dynamic":
-                RAMOptimizer.setOptimizationRulesStr(ram_optimizer_rules)
-                if RAMOptimizer.applicableRuleExists(dst_file_format, avif_encoder):
-                    single_worker_mode = True  # Cold start to avoid a RAM spike. RAM Optimizer can assign more in the worker.
-                RAMOptimizer.setEnabled(True)
-                RAMOptimizer.setUsedThreadCount(used_thread_count)
-            elif ram_optimizer_mode == "Disabled":
-                pass
-            else:
-                logging.error(f"[ThreadManager - configure] Unrecognized ram_optimizer_mode ({ram_optimizer_mode})")
-
+            match ram_optimizer_mode:
+                case "Static":
+                    single_worker_mode = True
+                case "Dynamic":
+                    RAMOptimizer.setOptimizationRulesStr(ram_optimizer_rules)
+                    if RAMOptimizer.applicableRuleExists(dst_file_format, avif_encoder):
+                        single_worker_mode = True   # Cold start to avoid a RAM spike. RAM Optimizer can assign more in the worker.
+                        RAMOptimizer.setEnabled(True)
+                        RAMOptimizer.setUsedThreadCount(used_thread_count)
+                case "Disabled":
+                    pass
+                case _:
+                    logging.error(f"[ThreadManager - configure] Unrecognized ram_optimizer_mode ({ram_optimizer_mode})")
+        
         # Setup workers
         if single_worker_mode:
             self.burst_threadpool = []

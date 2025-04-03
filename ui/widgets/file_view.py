@@ -175,35 +175,36 @@ class FileView(QTreeWidget):
         key = event.key()
         shift_pressed = event.modifiers() == Qt.ShiftModifier
 
-        if key == Qt.Key_Delete:
-            self.shift_start = None
-            self.deleteSelected()
-        elif key == Qt.Key_Up:
-            if shift_pressed:
-                self.selectShiftUp()
-            else:
+        match key:
+            case Qt.Key_Delete:
                 self.shift_start = None
-                self.moveIndexUp()
-        elif key == Qt.Key_Down:
-            if shift_pressed:
-                self.selectShiftDown()
-            else:
-                self.shift_start = None
-                self.moveIndexDown()
-        elif key == Qt.Key_Home:
-            if shift_pressed:
-                self.selectItemsAbove()
-            else:
-                self.moveIndexToTop()
-        elif key == Qt.Key_End:
-            if shift_pressed:
-                self.selectItemsBelow()
-            else:
-                self.moveIndexToBottom()
-        elif key == Qt.Key_PageUp:
-            self.movePage("up", shift_pressed)
-        elif key == Qt.Key_PageDown:
-            self.movePage("down", shift_pressed)
+                self.deleteSelected()
+            case Qt.Key_Up:
+                if shift_pressed:
+                    self.selectShiftUp()
+                else:
+                    self.shift_start = None
+                    self.moveIndexUp()
+            case Qt.Key_Down:
+                if shift_pressed:
+                    self.selectShiftDown()
+                else:
+                    self.shift_start = None
+                    self.moveIndexDown()
+            case Qt.Key_Home:
+                if shift_pressed:
+                    self.selectItemsAbove()
+                else:
+                    self.moveIndexToTop()
+            case Qt.Key_End:
+                if shift_pressed:
+                    self.selectItemsBelow()
+                else:
+                    self.moveIndexToBottom()
+            case Qt.Key_PageUp:
+                self.movePage("up", shift_pressed)
+            case Qt.Key_PageDown:
+                self.movePage("down", shift_pressed)
 
     def mousePressEvent(self, event):
         self.shift_start = None

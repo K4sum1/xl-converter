@@ -10,7 +10,10 @@ from core.exceptions import CancellationException
 
 def test_runBinary_happy_path():
     stdout, stderr = "completed", "test"
-    with patch("core.convert.task_status.wasCanceled", return_value=False),        patch("core.convert.runProcess2", return_value=(stdout, stderr)) as mock_runProcess2:
+    with (
+        patch("core.convert.task_status.wasCanceled", return_value=False),
+        patch("core.convert.runProcess2", return_value=(stdout, stderr)) as mock_runProcess2,
+    ):
         assert convert.runBinary(
             "path/bin",
             ["-arg1", "-arg2"],
@@ -26,7 +29,10 @@ def test_runBinary_happy_path():
 
 def test_runBinary_no_dst():
     stdout, stderr = "completed", "test"
-    with patch("core.convert.task_status.wasCanceled", return_value=False),        patch("core.convert.runProcess2", return_value=(stdout, stderr)) as mock_runProcess2:
+    with (
+        patch("core.convert.task_status.wasCanceled", return_value=False),
+        patch("core.convert.runProcess2", return_value=(stdout, stderr)) as mock_runProcess2,
+    ):
         assert convert.runBinary(
             "path/bin",
             ["-arg1", "-arg2"],
@@ -39,7 +45,11 @@ def test_runBinary_no_dst():
         )
 
 def test_runBinary_canceled():
-    with patch("core.convert.task_status.wasCanceled", return_value=True),        patch("core.convert.runProcess2", return_value=("", "")) as mock_runProcess2,        pytest.raises(CancellationException):
+    with (
+        patch("core.convert.task_status.wasCanceled", return_value=True),
+        patch("core.convert.runProcess2", return_value=("", "")) as mock_runProcess2,
+        pytest.raises(CancellationException)
+    ):
         convert.runBinary(
             "path/bin",
             ["-arg1", "-arg2"],
@@ -49,7 +59,10 @@ def test_runBinary_canceled():
         mock_runProcess2.assert_called_once()
 
 def test_runBinary_args_after_input():
-    with patch("core.convert.task_status.wasCanceled", return_value=False),        patch("core.convert.runProcess2", return_value=("", "")) as mock_runProcess2:
+    with (
+        patch("core.convert.task_status.wasCanceled", return_value=False),
+        patch("core.convert.runProcess2", return_value=("", "")) as mock_runProcess2,
+    ):
         convert.runBinary(
             "path/bin",
             ["-arg1", "-arg2"],
@@ -71,7 +84,12 @@ def test_runBinary_args_after_input():
 
 def test_runBinary_delete_if_canceled_not_empty():
     tmp_files = ["/tmp/file1.jpg", "/tmp/file2.jpg", "/tmp/file3.jpg"]
-    with patch("core.convert.task_status.wasCanceled", return_value=True),        patch("core.convert.runProcess2", return_value=("", "")) as mock_runProcess2,        patch("core.convert.os.path.isfile", side_effect=(False, True, True)) as mock_isfile,        patch("core.convert.os.remove") as mock_remove:
+    with (
+        patch("core.convert.task_status.wasCanceled", return_value=True),
+        patch("core.convert.runProcess2", return_value=("", "")) as mock_runProcess2,
+        patch("core.convert.os.path.isfile", side_effect=(False, True, True)) as mock_isfile,
+        patch("core.convert.os.remove") as mock_remove,
+    ):
         with pytest.raises(CancellationException):
             convert.runBinary(
                 "path/bin",
@@ -88,7 +106,12 @@ def test_runBinary_delete_if_canceled_not_empty():
         assert mock_remove.call_args_list[1][0][0] == tmp_files[2]
 
 def test_runBinary_delete_if_canceled_empty():
-    with patch("core.convert.task_status.wasCanceled", return_value=True),        patch("core.convert.runProcess2", return_value=("", "")) as mock_runProcess2,        patch("core.convert.os.path.isfile", return_value=False) as mock_isfile,        patch("core.convert.os.remove") as mock_remove:
+    with (
+        patch("core.convert.task_status.wasCanceled", return_value=True),
+        patch("core.convert.runProcess2", return_value=("", "")) as mock_runProcess2,
+        patch("core.convert.os.path.isfile", return_value=False) as mock_isfile,
+        patch("core.convert.os.remove") as mock_remove,
+    ):
         with pytest.raises(CancellationException):
             convert.runBinary(
                 "path/bin",
@@ -103,7 +126,11 @@ def test_runBinary_delete_if_canceled_empty():
 
 def test_runJPEGtran_happy_path():
     stdout, stderr = "completed", "test"
-    with patch("core.convert.JPEGTRAN_PATH", "djxl_path") as var_DJXL_PATH,        patch("core.convert.task_status.wasCanceled", return_value=False),        patch("core.convert.runProcess2", return_value=(stdout, stderr)) as mock_runProcess2:
+    with (
+        patch("core.convert.JPEGTRAN_PATH", "djxl_path") as var_DJXL_PATH,
+        patch("core.convert.task_status.wasCanceled", return_value=False),
+        patch("core.convert.runProcess2", return_value=(stdout, stderr)) as mock_runProcess2,
+    ):
         assert convert.runJPEGtran(
             ["-copy", "all"],
             "path/src.jpg",
@@ -119,7 +146,12 @@ def test_runJPEGtran_happy_path():
 
 def test_runJPEGtran_sad_path():
     stdout, stderr = "completed", "test"
-    with patch("core.convert.JPEGTRAN_PATH", "djxl_path") as var_DJXL_PATH,        patch("core.convert.task_status.wasCanceled", return_value=True),        patch("core.convert.runProcess2", return_value=(stdout, stderr)) as mock_runProcess2,        pytest.raises(CancellationException) as excinfo:
+    with (
+        patch("core.convert.JPEGTRAN_PATH", "djxl_path") as var_DJXL_PATH,
+        patch("core.convert.task_status.wasCanceled", return_value=True),
+        patch("core.convert.runProcess2", return_value=(stdout, stderr)) as mock_runProcess2,
+        pytest.raises(CancellationException) as excinfo,
+    ):
         convert.runJPEGtran(
             ["-copy", "all"],
             "path/src.jpg",
@@ -242,7 +274,10 @@ def test_getImageResMp_sad_path():
 def test_getImageCount_happy_path(caplog):
     image_path = "/tmp/image.jpg"
 
-    with patch("core.convert.runBinary", return_value=("5\n" * 5, "")) as mock_runBinary,        patch("core.convert.IMAGE_MAGICK_PATH", "im_path") as var_IMAGE_MAGICK_PATH:
+    with (
+        patch("core.convert.runBinary", return_value=("5\n" * 5, "")) as mock_runBinary,      # typical IM output
+        patch("core.convert.IMAGE_MAGICK_PATH", "im_path") as var_IMAGE_MAGICK_PATH,
+    ):
         assert convert.getImageCount(image_path) == (5, "")
         mock_runBinary.assert_called_once_with(
             var_IMAGE_MAGICK_PATH,
@@ -255,7 +290,10 @@ def test_getImageCount_image_count_not_available(caplog):
     image_path = "/tmp/image.jpg"
     stderr = "error"
 
-    with patch("core.convert.runBinary", return_value=("not found", stderr)) as mock_runBinary,        patch("core.convert.IMAGE_MAGICK_PATH", "im_path") as var_IMAGE_MAGICK_PATH:
+    with (
+        patch("core.convert.runBinary", return_value=("not found", stderr)) as mock_runBinary,
+        patch("core.convert.IMAGE_MAGICK_PATH", "im_path") as var_IMAGE_MAGICK_PATH,
+    ):
         assert convert.getImageCount(image_path) == (-1, stderr)
         mock_runBinary.assert_called_once_with(
             var_IMAGE_MAGICK_PATH,
@@ -269,7 +307,10 @@ def test_getImageCount_parsing_failed(caplog):
     mock_match = MagicMock()
     mock_match.group.side_effect = ValueError("invalid literal for int()")
 
-    with patch("core.convert.runBinary", return_value=("5\n" * 5, "")) as mock_runBinary,        patch("core.convert.re.search", return_value=mock_match):
+    with (
+        patch("core.convert.runBinary", return_value=("5\n" * 5, "")) as mock_runBinary,
+        patch("core.convert.re.search", return_value=mock_match)
+    ):
         assert convert.getImageCount("/tmp/image.jpg") == (-1, "")
         mock_runBinary.assert_called_once()
         assert "Parsing failed" in caplog.records[0].message 
@@ -277,7 +318,10 @@ def test_getImageCount_parsing_failed(caplog):
 
 def test_cleanUp_files_exist():
     tmp_files = ["/tmp/file1.jpg", "/tmp/file2.jpg", "/tmp/file3.jpg"]
-    with patch("core.convert.os.path.isfile", side_effect=(False, True, True)) as mock_isfile,        patch("core.convert.os.remove") as mock_remove:
+    with (
+        patch("core.convert.os.path.isfile", side_effect=(False, True, True)) as mock_isfile,
+        patch("core.convert.os.remove") as mock_remove,
+    ):
         convert.cleanUp(tmp_files)
     
         assert mock_isfile.call_count == 3
@@ -286,7 +330,10 @@ def test_cleanUp_files_exist():
         assert mock_remove.call_args_list[1][0][0] == tmp_files[2]
 
 def test_cleanUp_empty():
-    with patch("core.convert.os.path.isfile", return_value=False) as mock_isfile,        patch("core.convert.os.remove") as mock_remove:
+    with (
+        patch("core.convert.os.path.isfile", return_value=False) as mock_isfile,
+        patch("core.convert.os.remove") as mock_remove,
+    ):
         convert.cleanUp([])
         mock_isfile.assert_not_called()
         mock_remove.assert_not_called()

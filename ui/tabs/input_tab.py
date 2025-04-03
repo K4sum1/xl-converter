@@ -1,6 +1,6 @@
 from pathlib import Path
 import logging
-from typing import List, Tuple, Union
+from typing import List, Tuple, Literal
 import os
 
 from PySide6.QtWidgets import(
@@ -149,14 +149,15 @@ class InputTab(QWidget):
     #                Private
     # --------------------------------------
 
-    def _createFileDialog(self, mode: str, caption: str) -> Union[QFileDialog, None]:
-        if mode == "files":
-            last_used_dir_key = "add_files_last_dir"
-        elif mode == "folder":
-            last_used_dir_key = "add_folder_last_dir"
-        else:
-            logger.error(f"Unsupported mode ({mode})")
-            return None
+    def _createFileDialog(self, mode: Literal["files", "folder"], caption: str) -> QFileDialog | None:
+        match mode:
+            case "files":
+                last_used_dir_key = "add_files_last_dir"
+            case "folder":
+                last_used_dir_key = "add_folder_last_dir"
+            case _:
+                logger.error(f"Unsupported mode ({mode})")
+                return None
 
         # Load last used dir
         dir_to_load = self.wm.getVar(last_used_dir_key)
