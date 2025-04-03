@@ -25,6 +25,7 @@ from PySide6.QtGui import (
 )
 
 from data.constants import ICON_SVG, VERSION
+from typing import List, Tuple
 from .notifications import Notifications
 
 class ItemDelegate(QStyledItemDelegate):
@@ -147,7 +148,7 @@ class ExceptionView(QDialog):
 
         self._writeCsv(dlg.toLocalFile(), rows)
 
-    def _writeCsv(self, file_path: str, rows: list[tuple[str, ...]]) -> None:
+    def _writeCsv(self, file_path: str, rows: List[Tuple[str, ...]]) -> None:
         """Internal methods for writing CSV file."""
         try:
             with open(file_path, "w", newline="", encoding="utf-8") as csv_file:

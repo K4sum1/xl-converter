@@ -413,27 +413,25 @@ class SettingsTab(QWidget):
         self.play_sound_on_finish_vol_sb.setEnabled(enabled)
 
     def onAVIFBitDepthChanged(self) -> None:
-        match self.avif_encoder_cmb.currentText():
-            case "AOM AV1":
-                self.wm.setVar("aom_av1_bit_depth", self.avif_bit_depth_cmb.currentText())
-            case "SVT-AV1-PSY":
-                self.wm.setVar("svt_av1_psy_bit_depth", self.avif_bit_depth_cmb.currentText())
+        if self.avif_encoder_cmb.currentText() == "AOM AV1":
+            self.wm.setVar("aom_av1_bit_depth", self.avif_bit_depth_cmb.currentText())
+        elif self.avif_encoder_cmb.currentText() == "SVT-AV1-PSY":
+            self.wm.setVar("svt_av1_psy_bit_depth", self.avif_bit_depth_cmb.currentText())
 
     def onAVIFEncoderChanged(self) -> None:
         """Adjusts encoder settings based on which one is selected."""
         avif_enc = self.avif_encoder_cmb.currentText()
         with blockSignals(self.avif_bit_depth_cmb):
             self.avif_bit_depth_cmb.clear()
-            match avif_enc:
-                case "AOM AV1":
-                    self.avif_bit_depth_cmb.addItems(("Auto", "12", "10", "8"))
-                    loaded_var = self.wm.getVar("aom_av1_bit_depth")
-                case "SVT-AV1-PSY":
-                    self.avif_bit_depth_cmb.addItems(("Auto", "10", "8"))
-                    loaded_var = self.wm.getVar("svt_av1_psy_bit_depth")
-                case _:
-                    logging.error(f"[onAVIFEncoderChanged] Unknown encoder ({avif_enc})")
-                    return
+            if avif_enc == "AOM AV1":
+                self.avif_bit_depth_cmb.addItems(("Auto", "12", "10", "8"))
+                loaded_var = self.wm.getVar("aom_av1_bit_depth")
+            elif avif_enc == "SVT-AV1-PSY":
+                self.avif_bit_depth_cmb.addItems(("Auto", "10", "8"))
+                loaded_var = self.wm.getVar("svt_av1_psy_bit_depth")
+            else:
+                logging.error(f"[onAVIFEncoderChanged] Unknown encoder ({avif_enc})")
+                return
             self.avif_bit_depth_cmb.setCurrentText(loaded_var or "Auto")
             self.avif_aom_iq_tune_cb.setEnabled(avif_enc == "AOM AV1")
 

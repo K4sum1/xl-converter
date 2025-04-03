@@ -69,10 +69,7 @@ def test_setOptimizationRulesStr_rules_parsed(caplog):
     rules = '("all", 10.0, "1/2")'
     rules_native = [OptimizationRule("all", 10.0, "1/2") for _ in range(3)]
 
-    with (
-        patch("core.ram_optimizer.RAMOptimizer.parseOptimizationRules", return_value=rules_native) as mock_parseOptimizationRules,
-        patch("core.ram_optimizer.RAMOptimizer.setOptimizationRules") as mock_setOptimizationRules,
-    ):
+    with patch("core.ram_optimizer.RAMOptimizer.parseOptimizationRules", return_value=rules_native) as mock_parseOptimizationRules,        patch("core.ram_optimizer.RAMOptimizer.setOptimizationRules") as mock_setOptimizationRules:
         RAMOptimizer.setOptimizationRulesStr(rules)
         mock_setOptimizationRules(rules_native)
         mock_parseOptimizationRules.assert_called_once_with(rules)
@@ -81,10 +78,7 @@ def test_setOptimizationRulesStr_rules_parsed(caplog):
 def test_setOptimizationRulesStr_no_rules(caplog):
     caplog.set_level(logging.INFO)
 
-    with (
-        patch("core.ram_optimizer.RAMOptimizer.parseOptimizationRules", return_value=[]) as mock_parseOptimizationRules,
-        patch("core.ram_optimizer.RAMOptimizer.setOptimizationRules") as mock_setOptimizationRules,
-    ):
+    with patch("core.ram_optimizer.RAMOptimizer.parseOptimizationRules", return_value=[]) as mock_parseOptimizationRules,        patch("core.ram_optimizer.RAMOptimizer.setOptimizationRules") as mock_setOptimizationRules:
         RAMOptimizer.setOptimizationRulesStr('')
         assert "No rules found" in caplog.text
 

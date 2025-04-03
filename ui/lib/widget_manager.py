@@ -1,7 +1,7 @@
 import os
 import json
 import logging
-from typing import Any
+from typing import Any, List, Union
 
 from PySide6.QtWidgets import QWidget, QLineEdit, QComboBox, QTextEdit, QCheckBox, QRadioButton, QSlider, QSpinBox, QDoubleSpinBox
 
@@ -61,7 +61,7 @@ class WidgetManager():
         else:
             self.tags[tag] = [_id]
     
-    def addTags(self, _id: str, *tags: list[str]):
+    def addTags(self, _id: str, *tags: List[str]):
         if not _id in self.widgets:
             self.error(f"Widget not found ({_id})", "addTags")
             return
@@ -69,7 +69,7 @@ class WidgetManager():
         for tag in tags:
             self.addTag(tag, _id)
 
-    def getWidgetsByTag(self, tag: str) -> list[QWidget]:
+    def getWidgetsByTag(self, tag: str) -> List[QWidget]:
         if not tag in self.tags:
             self.error(f"Tag not found ({tag})", "getWidgetsByTag")
             return []
@@ -106,7 +106,7 @@ class WidgetManager():
     def setVar(self, var: str, value: Any):
         self.variables[var] = value
 
-    def getVar(self, var: str) -> Any | None:
+    def getVar(self, var: str) -> Union[Any, None]:
         if not var in self.variables:
             return None
 
@@ -164,28 +164,27 @@ class WidgetManager():
             return
 
         # Apply
-        match widget_class:
-            case "QCheckBox":
-                widget.setChecked(val)
-            case "QSlider":
-                widget.setValue(val)
-            case "QSpinBox":
-                widget.setValue(val)
-            case "QDoubleSpinBox":
-                widget.setValue(val)
-            case "QComboBox":
-                index = widget.findText(val)
-                if index == -1: # If not found
-                    index = 0
-                widget.setCurrentIndex(index)
-            case "QRadioButton":
-                widget.setChecked(val)
-            case "QLineEdit":
-                widget.setText(val)
-            case "QTextEdit":
-                widget.setPlainText(val)
-            case _:
-                self.error(f"Unsupported widget class ({widget_class})", "_applyValue")
+        if widget_class == "QCheckBox":
+            widget.setChecked(val)
+        elif widget_class == "QSlider":
+            widget.setValue(val)
+        elif widget_class == "QSpinBox":
+            widget.setValue(val)
+        elif widget_class == "QDoubleSpinBox":
+            widget.setValue(val)
+        elif widget_class == "QComboBox":
+            index = widget.findText(val)
+            if index == -1: # If not found
+                index = 0
+            widget.setCurrentIndex(index)
+        elif widget_class == "QRadioButton":
+            widget.setChecked(val)
+        elif widget_class == "QLineEdit":
+            widget.setText(val)
+        elif widget_class == "QTextEdit":
+            widget.setPlainText(val)
+        else:
+            self.error(f"Unsupported widget class ({widget_class})", "_applyValue")
 
     def _getWidgetSubclass(self, widget) -> str:
         supported_widgets = (QCheckBox, QSpinBox, QComboBox, QTextEdit, QSlider, QRadioButton, QLineEdit, QDoubleSpinBox)     # Sorted by popularity
@@ -214,23 +213,23 @@ class WidgetManager():
             if key in self.exceptions:
                 continue
             
-            match self._getWidgetSubclass(self.widgets[key]):
-                case "QCheckBox":
-                    widget_states[key] = self.widgets[key].isChecked()
-                case "QSlider":
-                    widget_states[key] = self.widgets[key].value()
-                case "QSpinBox":
-                    widget_states[key] = self.widgets[key].value()
-                case "QDoubleSpinBox":
-                    widget_states[key] = self.widgets[key].value()
-                case "QComboBox":
-                    widget_states[key] = self.widgets[key].currentText()    # Text (not index) in case order was changed
-                case "QRadioButton":
-                    widget_states[key] = self.widgets[key].isChecked()
-                case "QLineEdit":
-                    widget_states[key] = self.widgets[key].text()
-                case "QTextEdit":
-                    widget_states[key] = self.widgets[key].toPlainText()
+            widget_subclass = self._getWidgetSubclass(self.widgets[key])
+            if widget_subclass == "QCheckBox":
+                widget_states[key] = self.widgets[key].isChecked()
+            elif widget_subclass == "QSlider":
+                widget_states[key] = self.widgets[key].value()
+            elif widget_subclass == "QSpinBox":
+                widget_states[key] = self.widgets[key].value()
+            elif widget_subclass == "QDoubleSpinBox":
+                widget_states[key] = self.widgets[key].value()
+            elif widget_subclass == "QComboBox":
+                widget_states[key] = self.widgets[key].currentText()    # Text (not index) in case order was changed
+            elif widget_subclass == "QRadioButton":
+                widget_states[key] = self.widgets[key].isChecked()
+            elif widget_subclass == "QLineEdit":
+                widget_states[key] = self.widgets[key].text()
+            elif widget_subclass == "QTextEdit":
+                widget_states[key] = self.widgets[key].toPlainText()
                 # Unsupported widget get skipped when saving.
 
         if not widget_states and not self.variables:   # If empty

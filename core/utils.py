@@ -66,7 +66,7 @@ def b2sum(file_path: str, digest_size: int = 64, chunk_size: int = 8192) -> str:
 
     return hasher.hexdigest()
 
-def remove(*file_paths: list[str], exc_id="") -> None:
+def remove(*file_paths: List[str], exc_id="") -> None:
     """Removes file(s).
 
     Raises:

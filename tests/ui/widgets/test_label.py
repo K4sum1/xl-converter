@@ -20,9 +20,7 @@ def test_StyledLabel_updateStyleForAll(app):
     labels = [StyledLabel("<div><p>Sample text</p></div>") for _ in range(2)]
     custom_qss = "a {{ color: blue; }}"
 
-    with (
-        patch("ui.widgets.label.StyledLabel.updateStyle") as mock_updateStyle,
-    ):
+    with patch("ui.widgets.label.StyledLabel.updateStyle") as mock_updateStyle:
         labels[0].updateStyleForAll(custom_qss)
         mock_updateStyle.call_count == len(StyledLabel._instances)
         assert len(StyledLabel._instances) == 2

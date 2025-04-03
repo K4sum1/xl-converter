@@ -93,13 +93,7 @@ def getSuffix(path: str):
 
 @pytest.fixture
 def finishConversion_patches():
-    with (
-        patch("core.worker.os.remove") as mock_remove,
-        patch("core.worker.os.rename") as mock_rename,
-        patch("core.worker.os.path.getsize", return_value=300_000) as mock_getsize,
-        patch("core.worker.os.path.isfile", side_effect=[True, True, True]) as mock_isfile,
-        patch("core.worker.getUniqueFilePath", return_value="final/path/img.jpg") as mock_getUniqueFilePath,
-    ):
+    with patch("core.worker.os.remove") as mock_remove,        patch("core.worker.os.rename") as mock_rename,        patch("core.worker.os.path.getsize", return_value=300_000) as mock_getsize,        patch("core.worker.os.path.isfile", side_effect=[True, True, True]) as mock_isfile,        patch("core.worker.getUniqueFilePath", return_value="final/path/img.jpg") as mock_getUniqueFilePath:
         yield mock_remove, mock_rename, mock_getsize, mock_isfile, mock_getUniqueFilePath 
 
 
@@ -143,17 +137,7 @@ def test_runChecks(mock_conflicts, mock_isfile, worker):
 
 @pytest.fixture
 def setupConversion_patches():
-    with (
-        patch("core.worker.Proxy.isProxyNeeded", return_value=False) as mock_isProxyNeeded,
-        patch("core.worker.os.makedirs", side_effect=None) as mock_makedirs,
-        patch("core.worker.getUniqueTmpFilePath", return_value=normalizePath("/output/dir/image.jpg")) as mock_getUniqueTmpFilePath,
-        patch("core.worker.getOutputDir", return_value="/output/dir/") as mock_getOutputDir,
-        patch("core.worker.getExtensionJxl", return_value="jpg") as mock_getExtensionJxl,
-        patch("core.worker.os.path.isfile", side_effect=[True, True]) as mock_isfile,
-        patch("core.worker.os.path.getsize", return_value=300_000) as mock_getsize,
-        patch("core.worker.getFreeSpaceLeft", return_value=300_000_000_000) as mock_getFreeSpaceLeft,
-        patch("core.worker.getExtension", return_value="jxl") as mock_getExtension,
-    ):
+    with patch("core.worker.Proxy.isProxyNeeded", return_value=False) as mock_isProxyNeeded,        patch("core.worker.os.makedirs", side_effect=None) as mock_makedirs,        patch("core.worker.getUniqueTmpFilePath", return_value=normalizePath("/output/dir/image.jpg")) as mock_getUniqueTmpFilePath,        patch("core.worker.getOutputDir", return_value="/output/dir/") as mock_getOutputDir,        patch("core.worker.getExtensionJxl", return_value="jpg") as mock_getExtensionJxl,        patch("core.worker.os.path.isfile", side_effect=[True, True]) as mock_isfile,        patch("core.worker.os.path.getsize", return_value=300_000) as mock_getsize,        patch("core.worker.getFreeSpaceLeft", return_value=300_000_000_000) as mock_getFreeSpaceLeft,        patch("core.worker.getExtension", return_value="jxl") as mock_getExtension:
         yield (
             mock_getUniqueTmpFilePath,     # 0
             mock_getOutputDir,          # 1
@@ -633,14 +617,7 @@ def test_runExifTool_args_empty(mock_exiftool_env):
 
 @pytest.fixture
 def postConversionRoutines_patches():
-    with (
-        patch("core.worker.os.path.isfile", return_value=True) as mock_isfile,
-        patch("core.worker.metadata.runExifTool", return_value=[]) as mock_runExifTool,
-        patch("core.worker.shutil.copystat") as mock_copystat,
-        patch("core.worker.os.remove") as mock_remove,
-        patch("core.worker.send2trash") as mock_send2trash,
-        patch("core.worker.os.path.samefile", return_value=False),
-    ):
+    with patch("core.worker.os.path.isfile", return_value=True) as mock_isfile,        patch("core.worker.metadata.runExifTool", return_value=[]) as mock_runExifTool,        patch("core.worker.shutil.copystat") as mock_copystat,        patch("core.worker.os.remove") as mock_remove,        patch("core.worker.send2trash") as mock_send2trash,        patch("core.worker.os.path.samefile", return_value=False):
         yield mock_isfile, mock_runExifTool, mock_copystat, mock_remove, mock_send2trash
 
 def test_postConversionRoutines_no_output(postConversionRoutines_patches, worker):
@@ -1115,9 +1092,7 @@ def test_reconstructJPEG_sad_path(worker_reconstructJPEG_patched):
     stdout, stderr = "stdout", "stderr"
     mocks["reconstructJPEGfromJPEGXL"].return_value = (False, stdout, stderr)
 
-    with (
-        pytest.raises(FileException) as excinfo,
-    ):
+    with pytest.raises(FileException) as excinfo:
         worker.reconstructJPEG()
     
     assert excinfo.value.id == "reconstruct_0"
@@ -1135,10 +1110,7 @@ def test_runDynamicRamOptimizer_enabled(worker):
     new_available_threads = 5
     worker.available_threads = org_available_threads
 
-    with (
-        patch("core.worker.RAMOptimizer.isEnabled", return_value=True),
-        patch("core.worker.RAMOptimizer.run", return_value=new_available_threads) as mock_run,
-    ):
+    with patch("core.worker.RAMOptimizer.isEnabled", return_value=True),        patch("core.worker.RAMOptimizer.run", return_value=new_available_threads) as mock_run:
         worker.runDynamicRamOptimizer()
         mock_run.assert_called_once_with(
             org_available_threads,
@@ -1153,9 +1125,6 @@ def test_runDynamicRamOptimizer_enabled(worker):
         assert worker.available_threads == new_available_threads
 
 def test_runDynamicRamOptimizer_disabled(worker):
-    with (
-        patch("core.worker.RAMOptimizer.isEnabled", return_value=False),
-        patch("core.worker.RAMOptimizer.run") as mock_run,
-    ):
+    with patch("core.worker.RAMOptimizer.isEnabled", return_value=False),        patch("core.worker.RAMOptimizer.run") as mock_run:
         worker.runDynamicRamOptimizer()
         mock_run.assert_not_called()

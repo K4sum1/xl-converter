@@ -8,10 +8,7 @@ from ui.tabs.output_tab import OutputTab
 
 @pytest.fixture
 def app(qtbot):
-    with (
-        patch("ui.tabs.output_tab.WidgetManager.loadState"),
-        patch("ui.tabs.output_tab.WidgetManager.saveState"),
-    ):
+    with patch("ui.tabs.output_tab.WidgetManager.loadState"),        patch("ui.tabs.output_tab.WidgetManager.saveState"):
         tab = OutputTab(
             {
                 "disable_delete_startup": False,
@@ -89,29 +86,19 @@ def test_output_toggled(app):
 
 def test__onEffortToggled_jpeg_xl(app):
     app.jxl_int_effort_visible = True
-    with (
-        patch.object(app.format_cmb, "currentText", return_value="JPEG XL"),
-        patch.object(app.int_effort_cb, "isChecked", return_value=True),
-        patch.object(app.effort_sb, "setEnabled") as mock_setEnabled,
-    ):
+    with patch.object(app.format_cmb, "currentText", return_value="JPEG XL"),        patch.object(app.int_effort_cb, "isChecked", return_value=True),        patch.object(app.effort_sb, "setEnabled") as mock_setEnabled:
         app._onEffortToggled()
         mock_setEnabled.assert_called_once_with(False)
 
 def test__onEffortToggled_other(app):
     app.jxl_int_effort_visible = True
-    with (
-        patch.object(app.format_cmb, "currentText", return_value="PNG"),
-        patch.object(app.effort_sb, "setEnabled") as mock_setEnabled,
-    ):
+    with patch.object(app.format_cmb, "currentText", return_value="PNG"),        patch.object(app.effort_sb, "setEnabled") as mock_setEnabled:
         app._onEffortToggled()
         mock_setEnabled.assert_called_once_with(True)
 
 @pytest.mark.parametrize("visible", [True, False])
 def test_onJXLLossyModularVisibleToggled(visible, app):
-    with (
-        patch.object(app.format_cmb, "currentText", return_value="JPEG XL"),
-        patch("ui.tabs.output_tab.WidgetManager.setVisibleByTag") as mock_setVisibleByTag,
-    ):
+    with patch.object(app.format_cmb, "currentText", return_value="JPEG XL"),        patch("ui.tabs.output_tab.WidgetManager.setVisibleByTag") as mock_setVisibleByTag:
         app.onJXLLossyModularVisibleToggled(visible)
 
         assert app.jxl_lossy_modular_visible == visible
@@ -119,11 +106,7 @@ def test_onJXLLossyModularVisibleToggled(visible, app):
 
 @pytest.mark.parametrize("visible", [True, False])
 def test_onJXLIntEffortVisibleToggled(visible, app):
-    with (
-        patch.object(app.format_cmb, "currentText", return_value="JPEG XL"),
-        patch.object(app.int_effort_cb, "setVisible") as mock_setVisible,
-        patch.object(app, "_onEffortToggled") as mock__onEffortToggled,
-    ):
+    with patch.object(app.format_cmb, "currentText", return_value="JPEG XL"),        patch.object(app.int_effort_cb, "setVisible") as mock_setVisible,        patch.object(app, "_onEffortToggled") as mock__onEffortToggled:
         app.onJXLIntEffortVisibleToggled(visible)
 
         assert app.jxl_int_effort_visible == visible
@@ -266,11 +249,7 @@ def test_effort_ranges(app, file_format, min_val, max_val):
     assert app.effort_sb.maximum() == max_val
 
 def test__chooseOutput_var_default(app):
-    with (
-        patch("ui.tabs.output_tab.QFileDialog") as mock_qfiledialog,
-        patch("ui.lib.widget_manager.WidgetManager.getVar", return_value=None),
-        patch("ui.lib.utils.isPathValidStr", return_value=False),
-    ):
+    with patch("ui.tabs.output_tab.QFileDialog") as mock_qfiledialog,        patch("ui.lib.widget_manager.WidgetManager.getVar", return_value=None),        patch("ui.lib.utils.isPathValidStr", return_value=False):
         mock_qfiledialog.return_value.exec.return_value = False
 
         app._chooseOutput()
@@ -279,12 +258,7 @@ def test__chooseOutput_var_default(app):
 
 def test__chooseOutput_var_load(app):
     last_used = "/home/user/Pictures"
-    with (
-        patch("ui.tabs.output_tab.QFileDialog") as mock_qfiledialog,
-        patch("ui.lib.widget_manager.WidgetManager.getVar", return_value=last_used),
-        patch("ui.lib.widget_manager.WidgetManager.setVar") as mock_setVar,
-        patch("ui.tabs.output_tab.isPathValidStr", return_value=True),
-    ):
+    with patch("ui.tabs.output_tab.QFileDialog") as mock_qfiledialog,        patch("ui.lib.widget_manager.WidgetManager.getVar", return_value=last_used),        patch("ui.lib.widget_manager.WidgetManager.setVar") as mock_setVar,        patch("ui.tabs.output_tab.isPathValidStr", return_value=True):
         mock_qfiledialog.return_value.exec.return_value = False
 
         app._chooseOutput()
@@ -293,12 +267,7 @@ def test__chooseOutput_var_load(app):
 
 def test__chooseOutput_var_save(app):
     last_used = "/home/user/Pictures"
-    with (
-        patch("ui.tabs.output_tab.QFileDialog") as mock_qfiledialog,
-        patch("ui.lib.widget_manager.WidgetManager.getVar", return_value=last_used),
-        patch("ui.lib.widget_manager.WidgetManager.setVar") as mock_setVar,
-        patch("ui.tabs.output_tab.isPathValidStr", return_value=False),
-    ):
+    with patch("ui.tabs.output_tab.QFileDialog") as mock_qfiledialog,        patch("ui.lib.widget_manager.WidgetManager.getVar", return_value=last_used),        patch("ui.lib.widget_manager.WidgetManager.setVar") as mock_setVar,        patch("ui.tabs.output_tab.isPathValidStr", return_value=False):
         mock_qfiledialog.return_value.exec.return_value = True
         mock_qfiledialog.return_value.directory.return_value.absolutePath.return_value = last_used
         app.choose_output_ct_le = MagicMock()
@@ -319,11 +288,7 @@ def test_getSettings_special(widget_name, variable_name, associated_key, app):
     assert app.getSettings()[associated_key]
 
 def test__onJXLNormalizeClicked_no_var(app):
-    with (
-        patch.object(app.wm, "getVar", return_value=None) as mock_getVar,
-        patch.object(app.wm, "setVar") as mock_setVar,
-        patch.object(app.notifications, "notify") as mock_notify,
-    ):
+    with patch.object(app.wm, "getVar", return_value=None) as mock_getVar,        patch.object(app.wm, "setVar") as mock_setVar,        patch.object(app.notifications, "notify") as mock_notify:
         app._onJXLNormalizeClicked()
     
     mock_getVar.assert_called_once_with("jxl_normalize_checksum_msg_seen")
@@ -331,11 +296,7 @@ def test__onJXLNormalizeClicked_no_var(app):
     mock_setVar.assert_called_once_with("jxl_normalize_checksum_msg_seen", True)
 
 def test__onJXLNormalizeClicked_var_present(app):
-    with (
-        patch.object(app.wm, "getVar", return_value=True) as mock_getVar,
-        patch.object(app.wm, "setVar") as mock_setVar,
-        patch.object(app.notifications, "notify") as mock_notify,
-    ):
+    with patch.object(app.wm, "getVar", return_value=True) as mock_getVar,        patch.object(app.wm, "setVar") as mock_setVar,        patch.object(app.notifications, "notify") as mock_notify:
         app._onJXLNormalizeClicked()
     
     mock_getVar.assert_called_once_with("jxl_normalize_checksum_msg_seen")
