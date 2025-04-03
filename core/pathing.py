@@ -70,21 +70,20 @@ def getUniqueTmpFilePath(output_dir: str, file_ext: str) -> str:
 
 def getExtension(_format):
     """Get file extension for the specified format."""
-    match _format :
-        case "JPEG XL":
-            return "jxl"
-        case "PNG":
-            return "png"
-        case "AVIF":
-            return "avif"
-        case "WebP":
-            return "webp"
-        case "JPEG":
-            return "jpg"
-        case "Smallest Lossless":   # Handled in Worker
-            return None
-        case _:
-            raise GenericException("PG0", f"No extension declared for {_format}")
+    if _format == "JPEG XL":
+        return "jxl"
+    elif _format == "PNG":
+        return "png"
+    elif _format == "AVIF":
+        return "avif"
+    elif _format == "WebP":
+        return "webp"
+    elif _format == "JPEG":
+        return "jpg"
+    elif _format == "Smallest Lossless":
+        return None
+    else:
+        raise GenericException("PG0", f"No extension declared for {_format}")
 
 def getOutputDir(
         item_dir_path: str,

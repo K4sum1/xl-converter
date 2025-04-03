@@ -235,13 +235,12 @@ class Interact:
         QTest.qWait(100)
     
     def get_settings(self, tab):
-        match tab:
-            case "output_tab":
-                return self.main_window.output_tab.getSettings()
-            case "modify_tab":
-                return self.main_window.modify_tab.getSettings()
-            case "settings_tab":
-                return self.main_window.settings_tab.getSettings()
+        if tab == "output_tab":
+            return self.main_window.output_tab.getSettings()
+        elif tab == "modify_tab":
+            return self.main_window.modify_tab.getSettings()
+        elif tab == "settings_tab":
+            return self.main_window.settings_tab.getSettings()
     
     def set_metadata_mode(self, mode):
         self.main_window.modify_tab.metadata_cmb.setCurrentText(mode)

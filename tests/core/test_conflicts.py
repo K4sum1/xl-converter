@@ -63,9 +63,7 @@ def test_checkForConflicts_cannot_detect_page_count(checkForConflicts_patches):
     stderr = "Error"
     mocks["getImageCount"].return_value = (-1, stderr)
 
-    with (
-        pytest.raises(FileException) as exc_info,
-    ):
+    with pytest.raises(FileException) as exc_info:
         conflicts.checkForConflicts("tiff", "path/to/src.tiff", "JPEG XL", False)
     
         assert "CF2" == exc_info.value.id
@@ -77,9 +75,7 @@ def test_checkForConflicts_multipage(checkForConflicts_patches):
     stderr = "Error"
     mocks["getImageCount"].return_value = (2, stderr)
 
-    with (
-        pytest.raises(GenericException) as exc_info,
-    ):
+    with pytest.raises(GenericException) as exc_info:
         conflicts.checkForConflicts("tiff", "path/to/src.tiff", "JPEG XL", False)
     
         assert "CF3" == exc_info.value.id
@@ -90,9 +86,7 @@ def test_checkForConflicts_animated_webp_source(checkForConflicts_patches):
     stderr = "Error"
     mocks["getImageCount"].return_value = (2, stderr)
 
-    with (
-        pytest.raises(GenericException) as exc_info,
-    ):
+    with pytest.raises(GenericException) as exc_info:
         conflicts.checkForConflicts("webp", "path/to/src.tiff", "JPEG XL", False)
     
         assert "CF3" == exc_info.value.id

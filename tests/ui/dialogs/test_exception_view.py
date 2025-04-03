@@ -27,10 +27,10 @@ def test_addItem(exception_view):
 
     mock_item = MagicMock(spec=QTreeWidgetItem)
 
-    with (
-        patch("ui.dialogs.exception_view.QTreeWidgetItem", return_value=mock_item),
-        patch.object(exception_view.exceptions_t, "addTopLevelItem") as mock_addTopLevelItem,
-    ):
+    with \
+        patch("ui.dialogs.exception_view.QTreeWidgetItem", return_value=mock_item), \
+        patch.object(exception_view.exceptions_t, "addTopLevelItem") as mock_addTopLevelItem:
+
         exception_view.addItem(id_str, exception, source)
         assert mock_item.setText.call_args_list[0][0] == (0, id_str)
         assert mock_item.setTextAlignment.call_args_list[0][0] == (0, Qt.AlignCenter)
@@ -63,12 +63,12 @@ def test_saveToFile_happy_path(exception_view):
     exception_view.exceptions_t.topLevelItemCount.return_value = len(mock_items)
     exception_view.exceptions_t.topLevelItem.side_effect = lambda i: mock_items[i]
 
-    with (
-        patch.object(exception_view, "isEmpty", return_value=False) as mock_isEmpty,
-        patch("ui.dialogs.exception_view.QFileDialog.getSaveFileUrl", return_value=(mock_dlg, None)) as mock_getSaveFileUrl,
-        patch.object(exception_view, "_writeCsv") as mock__writeCsv,
-        patch("ui.dialogs.exception_view.VERSION", "version") as version,
-    ):
+    with \
+        patch.object(exception_view, "isEmpty", return_value=False) as mock_isEmpty, \
+        patch("ui.dialogs.exception_view.QFileDialog.getSaveFileUrl", return_value=(mock_dlg, None)) as mock_getSaveFileUrl, \
+        patch.object(exception_view, "_writeCsv") as mock__writeCsv, \
+        patch("ui.dialogs.exception_view.VERSION", "version") as version:
+
         exception_view.saveToFile()
 
         expected_rows = [
@@ -82,11 +82,11 @@ def test_saveToFile_happy_path(exception_view):
         
 
 def test_saveToFile_empty(exception_view):
-    with (
-        patch.object(exception_view, "isEmpty", return_value=True),
-        patch.object(exception_view.notifications, "notify") as mock_notify,
-        patch.object(exception_view, "_writeCsv") as mock__writeCsv,
-    ):
+    with \
+        patch.object(exception_view, "isEmpty", return_value=True), \
+        patch.object(exception_view.notifications, "notify") as mock_notify, \
+        patch.object(exception_view, "_writeCsv") as mock__writeCsv:
+
         exception_view.saveToFile()
 
         mock_notify.assert_called_once()
@@ -96,11 +96,11 @@ def test_saveToFile_dlg_invalid(exception_view):
     mock_dlg = MagicMock()
     mock_dlg.isValid.return_value = False
 
-    with (
-        patch.object(exception_view, "isEmpty", return_value=False),
-        patch("ui.dialogs.exception_view.QFileDialog.getSaveFileUrl", return_value=(mock_dlg, None)),
-        patch.object(exception_view, "_writeCsv") as mock__writeCsv,
-    ):
+    with \
+        patch.object(exception_view, "isEmpty", return_value=False), \
+        patch("ui.dialogs.exception_view.QFileDialog.getSaveFileUrl", return_value=(mock_dlg, None)), \
+        patch.object(exception_view, "_writeCsv") as mock__writeCsv:
+
         exception_view.saveToFile()
 
         mock_dlg.isValid.assert_called_once()
@@ -113,11 +113,11 @@ def test__writeCsv_happy_path(exception_view):
         ("Val 1", "Val 2"),
     ]
 
-    with (
-        patch("builtins.open", mock_open()) as mock_csv_file,
-        patch("ui.dialogs.exception_view.csv.writer") as mock_csv_writer,
-        patch.object(exception_view.notifications, "notifyDetailed") as mock_notifyDetailed,
-    ):
+    with \
+        patch("builtins.open", mock_open()) as mock_csv_file, \
+        patch("ui.dialogs.exception_view.csv.writer") as mock_csv_writer, \
+        patch.object(exception_view.notifications, "notifyDetailed") as mock_notifyDetailed:
+
         exception_view._writeCsv(file_path, rows)
 
         mock_csv_file.assert_called_once_with(file_path, "w", newline="", encoding="utf-8")
@@ -134,11 +134,11 @@ def test__writeCsv_sad_path(exception_view):
     ]
 
 
-    with (
-        patch("builtins.open", side_effect=OSError()) as mock_csv_file,
-        patch("ui.dialogs.exception_view.csv.writer") as mock_csv_writer,
-        patch.object(exception_view.notifications, "notifyDetailed") as mock_notifyDetailed,
-    ):
+    with \
+        patch("builtins.open", side_effect=OSError()) as mock_csv_file, \
+        patch("ui.dialogs.exception_view.csv.writer") as mock_csv_writer, \
+        patch.object(exception_view.notifications, "notifyDetailed") as mock_notifyDetailed:
+
         exception_view._writeCsv(file_path, rows)
 
         mock_csv_file.assert_called_once_with(file_path, "w", newline="", encoding="utf-8")
@@ -155,10 +155,10 @@ def test_resizeToContent(item_count, expected, exception_view):
         assert exception_view.isEmpty() == expected
 
 def test_reset(exception_view):
-    with (
-        patch.object(exception_view, "close") as mock_close,
-        patch.object(exception_view, "clear") as mock_clear,
-    ):
+    with \
+        patch.object(exception_view, "close") as mock_close, \
+        patch.object(exception_view, "clear") as mock_clear:
+
         exception_view.reset()
 
         mock_close.assert_called_once()

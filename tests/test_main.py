@@ -64,8 +64,7 @@ class MockQThreadPool(QThreadPool):
 
 @pytest.fixture
 def main_window(qtbot):
-    with (
-        patch.multiple("main",
+    with patch.multiple("main",
             QThreadPool=MockQThreadPool,
             LoggingManager=MagicMock(),
             Controller=MagicMock(),
@@ -78,9 +77,8 @@ def main_window(qtbot):
             Notifications=MagicMock(),
             ProgressDialog=MagicMock(),
             QTabWidget=MockTabWidget,
-        ),
+        ):
         # patch("main.MainWindow.closeEvent"),
-    ):
         main = MainWindow()
         qtbot.addWidget(main)
         yield main
@@ -148,7 +146,7 @@ def test_finishProcessing(main_window_patched):
 @pytest.mark.parametrize("play_sound_on_finish", [True, False])
 def test_finishProcessing_play_sound(play_sound_on_finish, main_window_patched):
     main_window, mocks, *_ = main_window_patched
-    mocks["settings_tab_getSettings"].return_value = mocks["settings_tab_getSettings"].return_value | {"play_sound_on_finish": play_sound_on_finish}
+    mocks["settings_tab_getSettings"].return_value = {**mocks["settings_tab_getSettings"].return_value, **{"play_sound_on_finish": play_sound_on_finish}}
 
     main_window.finishProcessing()
     if play_sound_on_finish:
@@ -264,9 +262,7 @@ def test_isUIEnabled(enabled, main_window):
     assert main_window.isUIEnabled() == main_window.tabs.isEnabled.return_value
 
 def test_closeEvent(main_window):
-    with (
-        patch("main.ProcessManager.terminateAll") as mock_terminateAll,
-    ):
+    with patch("main.ProcessManager.terminateAll") as mock_terminateAll:
         main_window.closeEvent(QCloseEvent())
 
         main_window.settings_tab.saveState.assert_called_once()
@@ -276,19 +272,17 @@ def test_closeEvent(main_window):
         mock_terminateAll.assert_not_called()
     
 def test_closeEvent_terminateAll(main_window):
-    with (
-        patch.object(main_window.threadpool, "activeThreadCount", return_value=1) as mock_activeThreadCount,
-        patch("main.ProcessManager.terminateAll") as mock_terminateAll,
-    ):
+    with \
+        patch.object(main_window.threadpool, "activeThreadCount", return_value=1) as mock_activeThreadCount, \
+        patch("main.ProcessManager.terminateAll") as mock_terminateAll:
         main_window.closeEvent(QCloseEvent())
 
         mock_terminateAll.assert_called_once()
 
 def test_closeEvent_dont_terminateAll(main_window):
-    with (
-        patch.object(main_window.threadpool, "activeThreadCount", return_value=1) as mock_activeThreadCount,
-        patch("main.ProcessManager.terminateAll") as mock_terminateAll,
-    ):
+    with \
+        patch.object(main_window.threadpool, "activeThreadCount", return_value=1) as mock_activeThreadCount, \
+        patch("main.ProcessManager.terminateAll") as mock_terminateAll:
         main_window.closeEvent(QCloseEvent())
 
         mock_terminateAll.assert_called_once()
@@ -331,9 +325,7 @@ def test_dropEvent(has_urls, main_window_patched):
     mock_event = MagicMock(spec=QDropEvent)
     mock_event.mimeData().hasUrls.return_value = has_urls
 
-    with (
-        patch.object(main_window.tabs, "setCurrentIndex") as mock_setCurrentIndex,
-    ):
+    with patch.object(main_window.tabs, "setCurrentIndex") as mock_setCurrentIndex:
         main_window.dropEvent(mock_event)
 
         assert mock_event.accept.call_count == (1 if has_urls else 0)

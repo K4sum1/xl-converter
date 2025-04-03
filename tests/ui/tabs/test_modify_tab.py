@@ -8,10 +8,10 @@ from ui.tabs.modify_tab import ModifyTab
 
 @pytest.fixture
 def app(qtbot):
-    with (
-        patch("ui.tabs.modify_tab.WidgetManager.loadState"),
-        patch("ui.tabs.modify_tab.WidgetManager.saveState"),
-    ):
+    with \
+        patch("ui.tabs.modify_tab.WidgetManager.loadState"), \
+        patch("ui.tabs.modify_tab.WidgetManager.saveState"):
+
         tab = ModifyTab(
             {
                 "disable_downscaling_startup": False,
@@ -132,9 +132,7 @@ def test_onFileFormatChanged(app):
     file_format = "JPEG XL"
     app.file_format = None
 
-    with (
-        patch.object(app, "_updateFileFormat") as mock__updateFileFormat,
-    ):
+    with patch.object(app, "_updateFileFormat") as mock__updateFileFormat:
         app.onFileFormatChanged(file_format)
 
         mock__updateFileFormat.assert_called_once()
@@ -148,10 +146,10 @@ def test_onFileFormatChanged(app):
 def test__updateFileFormat(file_format, enabled, app):
     app.file_format = file_format
 
-    with (
-        patch.object(app.metadata_cmb, "setEnabled") as mock_metadata_cmb_setEnabled,
-        patch.object(app.metadata_l, "setEnabled") as mock_metadata_l_setEnabled,
-    ):
+    with \
+        patch.object(app.metadata_cmb, "setEnabled") as mock_metadata_cmb_setEnabled, \
+        patch.object(app.metadata_l, "setEnabled") as mock_metadata_l_setEnabled:
+
         app._updateFileFormat()
 
         mock_metadata_cmb_setEnabled.assert_called_once_with(enabled)

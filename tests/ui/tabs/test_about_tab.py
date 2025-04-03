@@ -20,19 +20,19 @@ def test_toggle_update_checker(enabled, qtbot):
     assert tab.update_btn.isEnabled() == enabled
 
 def test_checkForUpdates(about_tab):
-    with (
-        patch("ui.tabs.about_tab.UpdateChecker.run") as mock_run,
-        patch("ui.tabs.about_tab.constants.UPDATE_CHECKER_ENABLED", True),
-    ):
+    with \
+        patch("ui.tabs.about_tab.UpdateChecker.run") as mock_run, \
+        patch("ui.tabs.about_tab.constants.UPDATE_CHECKER_ENABLED", True):
+
         about_tab.update_btn.clicked.emit()
         mock_run.assert_called_once()
         assert not about_tab.update_btn.isEnabled()
 
 def test_update_btn_reenabled(about_tab, qtbot):
-    with (
-        patch("ui.tabs.about_tab.UpdateChecker.run") as mock_run,
-        patch("ui.tabs.about_tab.constants.UPDATE_CHECKER_ENABLED", True),
-    ):
+    with \
+        patch("ui.tabs.about_tab.UpdateChecker.run") as mock_run, \
+        patch("ui.tabs.about_tab.constants.UPDATE_CHECKER_ENABLED", True):
+
         qtbot.mouseClick(about_tab.update_btn, Qt.LeftButton)
         assert not about_tab.update_btn.isEnabled()
         about_tab.update_checker.finished.emit()

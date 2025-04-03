@@ -11,9 +11,7 @@ import data.constants as constants
 from core.exceptions import FileException
 
 def test_runExifTool():
-    with (
-        patch("core.metadata._runExifTool") as mock_run,
-    ):
+    with patch("core.metadata._runExifTool") as mock_run:
         metadata.runExifTool(
             "/path/to/src.jpg",
             "/path/to/dst.jpg",
@@ -27,23 +25,23 @@ def test_runExifTool():
         )
 
 def test__runExifTool_linux():
-    with (
-        patch("platform.system", return_value="Linux"),
-        patch("core.metadata._runExifTool") as mock_run,
-    ):
+    with \
+        patch("platform.system", return_value="Linux"), \
+        patch("core.metadata._runExifTool") as mock_run:
+
         et_args = "-arg1", "-arg2"
         metadata._runExifTool(et_args)
         mock_run.assert_called_once_with(et_args)
 
 def test__runExifTool_windows():
-    with (
-        patch("platform.system", return_value="Windows"),
-        patch("core.metadata.runProcess") as mock_run,
-        patch("os.unlink") as mock_unlink,
-        patch("tempfile.NamedTemporaryFile") as mock_tempfile,
-        patch("os.path.basename", return_value="tmp_file_name"),
-        patch("os.path.dirname", return_value="tmp_dir_name"),
-    ):
+    with \
+        patch("platform.system", return_value="Windows"), \
+        patch("core.metadata.runProcess") as mock_run, \
+        patch("os.unlink") as mock_unlink, \
+        patch("tempfile.NamedTemporaryFile") as mock_tempfile, \
+        patch("os.path.basename", return_value="tmp_file_name"), \
+        patch("os.path.dirname", return_value="tmp_dir_name"):
+
         # Arrange
         mock_file = MagicMock()
         mock_file.name = "/tmp/xl-converter/test.txt"
@@ -65,12 +63,12 @@ def test__runExifTool_windows():
         )
 
 def test__runExifTool_windows_cleanup_exc():
-    with (
-        patch("platform.system", return_value="Windows"),
-        patch("core.metadata.runProcess"),
-        patch("os.unlink"),
-        patch("tempfile.NamedTemporaryFile") as mock_tempfile,
-    ):
+    with \
+        patch("platform.system", return_value="Windows"), \
+        patch("core.metadata.runProcess"), \
+        patch("os.unlink"), \
+        patch("tempfile.NamedTemporaryFile") as mock_tempfile:
+
         mock_tempfile.side_effect = OSError("error")
 
         with pytest.raises(FileException) as exc:
@@ -78,12 +76,12 @@ def test__runExifTool_windows_cleanup_exc():
         assert "error" in str(exc.value)
 
 def test__runExifTool_windows_file_exc():
-    with (
-        patch("platform.system", return_value="Windows"),
-        patch("core.metadata.runProcess"),
-        patch("os.unlink", side_effect=OSError("error")),
-        patch("tempfile.NamedTemporaryFile") as mock_tempfile,
-    ):
+    with \
+        patch("platform.system", return_value="Windows"), \
+        patch("core.metadata.runProcess"), \
+        patch("os.unlink", side_effect=OSError("error")), \
+        patch("tempfile.NamedTemporaryFile") as mock_tempfile:
+
         mock_tempfile.return_value.__enter__.return_value = MagicMock()
 
         with pytest.raises(FileException) as exc:
@@ -107,10 +105,10 @@ def reset_data():
     ("Darwin", ("", ""), (True, "")),
 ])
 def test_isExifToolAvailable(reset_data, system, output, expected):
-    with (
-        patch("platform.system", return_value=system),
-        patch("core.metadata.runProcessOutput", return_value=output)
-    ):
+    with \
+        patch("platform.system", return_value=system) as mock_system, \
+        patch("core.metadata.runProcessOutput", return_value=output) as mock_run_process:
+
         is_available, err_msg = metadata.isExifToolAvailable(QMutex())
         assert is_available == expected[0]
         assert type(expected[1]) is str
