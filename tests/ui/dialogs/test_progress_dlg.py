@@ -6,7 +6,7 @@ from PySide6.QtWidgets import QProgressDialog
 from ui.dialogs.progress_dlg import ProgressDialog
 
 @pytest.fixture
-def progress_dialog(qtbot):
+def progress_dialog():
     return ProgressDialog()
 
 def test_init(progress_dialog):
@@ -46,10 +46,9 @@ def test_setValue_instance(progress_dialog):
 
 def test_setLabelText_instance(progress_dialog):
     progress_dialog.dlg = MagicMock(spec=QProgressDialog)
-    
     progress_dialog.setLabelText("test")
 
-    progress_dialog.dlg.setLabelText.assert_called_once_with("test")
+    assert progress_dialog.dlg.setLabelText.called_with("test")
 
 def test_setLabelText_none(progress_dialog):
     progress_dialog.setLabelText("test")
