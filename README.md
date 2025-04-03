@@ -45,7 +45,7 @@ Scale down images to resolution, percent, shortest (and longest) side, and megap
 ### Windows 10
 
 Install:
-- [Python 3.13](https://python.org/downloads/) (check `Add python.exe to PATH`)
+- [Python 3.11.9](https://python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe) (check `Add python.exe to PATH`)
 - [git](https://git-scm.com/)
 
 Clone the repo.
@@ -139,11 +139,11 @@ Install Python build packages.
 sudo apt install wget build-essential libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev liblzma-dev
 ```
 
-Compile and setup Python `3.13`.
+Build and setup Python `3.11.10`.
 
 ```bash
-pyenv install 3.13
-pyenv global 3.13
+pyenv install 3.11.10
+pyenv global 3.11.10
 ```
 
 Clone and set up the repo.
