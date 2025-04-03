@@ -219,24 +219,21 @@ class Builder():
         self._copyAssets()
         self._finish()
 
-        match platform.system():
-            case "Linux":
-                match build_type:
-                    case "sh":
-                        self._appendDesktopEntry()
-                        self._appendInstaller()
-                        self._build7z()
-                    case "appimage":
-                        self._appendDesktopEntry()
-                        self._buildAppImage()
-            case "Windows":
-                # self.downloader.downloadRedistributable()
-                match build_type:
-                    case "innosetup":
-                        self._appendInstaller()
-                    case "portable":
-                        self._appendConfig(portable=True)
-                        self._buildPortableWin()
+        if platform.system() == "Linux":
+            if build_type == "sh":
+                self._appendDesktopEntry()
+                self._appendInstaller()
+                self._build7z()
+            elif build_type == "appimage":
+                self._appendDesktopEntry()
+                self._buildAppImage()
+        elif platform.system() == "Windows":
+            # self.downloader.downloadRedistributable()
+            if build_type == "innosetup":
+                self._appendInstaller()
+            elif build_type == "portable":
+                self._appendConfig(portable=True)
+                self._buildPortableWin()
        
         if self.args.getArg("update_file"):
             self._appendUpdateFile()
@@ -286,16 +283,15 @@ class Builder():
         installer_file = os.path.basename(installer_dir)
 
         print("[Building] Appending an installer script")
-        match platform.system():
-            case "Linux":
-                copy(installer_dir, self.dst_dir)
-                print("[Building] Embedding version into an installer script")
-                replaceLine(f"{self.dst_dir}/{installer_file}", "VERSION=", f"VERSION=\"{VERSION}\"\n")
-            case "Windows":
-                copy(installer_dir, self.dst_dir)
-                print("[Building] Embedding version into an installer script")
-                replaceLine(f"{self.dst_dir}/{installer_file}", "#define MyAppVersion", f"#define MyAppVersion \"{VERSION}\"\n")
-                replaceLine(f"{self.dst_dir}/{installer_file}", "OutputBaseFilename=", f"OutputBaseFilename={self.build_inno_name}\n")
+        if platform.system() == "Linux":
+            copy(installer_dir, self.dst_dir)
+            print("[Building] Embedding version into an installer script")
+            replaceLine(f"{self.dst_dir}/{installer_file}", "VERSION=", f"VERSION=\"{VERSION}\"\n")
+        elif platform.system() == "Windows":
+            copy(installer_dir, self.dst_dir)
+            print("[Building] Embedding version into an installer script")
+            replaceLine(f"{self.dst_dir}/{installer_file}", "#define MyAppVersion", f"#define MyAppVersion \"{VERSION}\"\n")
+            replaceLine(f"{self.dst_dir}/{installer_file}", "OutputBaseFilename=", f"OutputBaseFilename={self.build_inno_name}\n")
     
     def _appendDesktopEntry(self):
         if platform.system() == "Linux":

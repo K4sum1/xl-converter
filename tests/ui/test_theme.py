@@ -21,12 +21,12 @@ def test_setTheme_happy_path(caplog):
     mock_stylesheet = "sample stylesheet"
     mock_theme_name = "Ralsei"
 
-    with (
-        patch("ui.theme.theme_manager.getTheme", return_value=mock_theme) as mock_getTheme,
-        patch("ui.theme.theme_manager.getStyleSheet", return_value=mock_stylesheet) as mock_getStyleSheet,
-        patch("ui.theme.theme_manager.QApplication.instance", return_value=mock_qapp_instance),
-        patch("ui.theme.theme_manager.StyledLabel.updateStyleForAll") as mock_updateStyleForAll,
-    ):
+    with \
+        patch("ui.theme.theme_manager.getTheme", return_value=mock_theme) as mock_getTheme, \
+        patch("ui.theme.theme_manager.getStyleSheet", return_value=mock_stylesheet) as mock_getStyleSheet, \
+        patch("ui.theme.theme_manager.QApplication.instance", return_value=mock_qapp_instance), \
+        patch("ui.theme.theme_manager.StyledLabel.updateStyleForAll") as mock_updateStyleForAll:
+
         theme.theme_manager.setTheme(mock_theme_name)
 
         mock_getTheme.assert_called_once_with(mock_theme_name)
@@ -43,12 +43,12 @@ def test_setTheme_sad_path(caplog):
     mock_theme = MagicMock()
     mock_theme.colors.accent_big = "#111111"
 
-    with (
-        patch("ui.theme.theme_manager.getTheme", return_value=mock_theme),
-        patch("ui.theme.theme_manager.getStyleSheet", return_value=""),
-        patch("ui.theme.theme_manager.QApplication.instance", return_value=None),
-        caplog.at_level(logging.ERROR),
-    ):
+    with \
+        patch("ui.theme.theme_manager.getTheme", return_value=mock_theme), \
+        patch("ui.theme.theme_manager.getStyleSheet", return_value=""), \
+        patch("ui.theme.theme_manager.QApplication.instance", return_value=None), \
+        caplog.at_level(logging.ERROR):
+
         theme.theme_manager.setTheme()
         mock_qapp_instance.setStyle.assert_not_called()
         caplog.records[0].message == "QApplication not found."

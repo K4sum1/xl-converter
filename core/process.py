@@ -3,8 +3,9 @@ import os
 import logging
 
 from data.process_manager import ProcessManager
+from typing import Union
 
-def runProcess2(*cmd: str, cwd: str | None = None) -> (str, str):
+def runProcess2(*cmd: str, cwd: Union[str, None] = None) -> (str, str):
     """Replacement for runProcess() and runProcessOutput().
     
     Returns:

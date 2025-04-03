@@ -204,34 +204,33 @@ def _downscaleManualModes(params, mutex):
     args = []
     if params['resample'] != "Default" and params['resample'] in ALLOWED_RESAMPLING:
         args.append(f"-filter {params['resample']}")
-    
-    match params["mode"]:
-        case "Percent":
-            args.append(f"-resize {params['percent']}%")
 
-        case "Resolution":
-            if params['width'] != float("inf") and params['height'] != float("inf"):
-                args.append(f"-resize {params['width']}x{params['height']}>")
-            elif params['width'] != float("inf"):
-                args.append(f"-resize {params['width']}x>")
-            elif params['height'] != float("inf"):
-                args.append(f"-resize x{params['height']}>")
-            else:
-                raise GenericException("D20", "Expected downscaling disabled.")
+    if params["mode"] == "Percent":
+        args.append(f"-resize {params['percent']}%")
 
-        case "Shortest Side":
-            args.append(f"-resize {params['shortest_side']}x{params['shortest_side']}^>")
+    elif params["mode"] == "Resolution":
+        if params['width']!= float("inf") and params['height']!= float("inf"):
+            args.append(f"-resize {params['width']}x{params['height']}>")
+        elif params['width']!= float("inf"):
+            args.append(f"-resize {params['width']}x>")
+        elif params['height']!= float("inf"):
+            args.append(f"-resize x{params['height']}>")
+        else:
+            raise GenericException("D20", "Expected downscaling disabled.")
 
-        case "Longest Side":
-            args.append(f"-resize {params['longest_side']}x{params['longest_side']}>")
+    elif params["mode"] == "Shortest Side":
+        args.append(f"-resize {params['shortest_side']}x{params['shortest_side']}^>")
 
-        case "Megapixels":
-            megapixels = int(params['megapixels'] * 1_000_000)
-            args.append(f"-resize {megapixels}@>")
-            
-        case _:
-            raise GenericException("D2", f"Downscaling mode not recognized ({params['mode']})")
-    
+    elif params["mode"] == "Longest Side":
+        args.append(f"-resize {params['longest_side']}x{params['longest_side']}>")
+
+    elif params["mode"] == "Megapixels":
+        megapixels = int(params['megapixels'] * 1000000)
+        args.append(f"-resize {megapixels}@>")
+
+    else:
+        raise GenericException("D2", f"Downscaling mode not recognized ({params['mode']})")
+
     # Downscale
     if params["enc"] == IMAGE_MAGICK_PATH:  # We can just add arguments If the encoder is ImageMagick, since it also handles downscaling
         args.extend(params["args"])

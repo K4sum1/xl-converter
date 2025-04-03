@@ -4,7 +4,7 @@
 
 Easy-to-use image converter for modern formats.
 
-Available for Windows and Linux.
+Available for Windows.
 
 ![](misc/images/screenshot_0.png)
 
@@ -42,163 +42,15 @@ Scale down images to resolution, percent, shortest (and longest) side, and megap
 > [!NOTE]
 > The recommended way of using XL Converter is through the [official binary releases](https://codepoems.eu/xl-converter). The building process is time-consuming and tedious.
 
-### Windows 10
-
 Install:
-- [Python 3.11.9](https://python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe) (check `Add python.exe to PATH`)
+- [Python 3.8.13](https://www.4shared.com/web/directDownload/6EE9oUrxfa/B8-gUmU2.cc8672d1653983e3aa55b15dc9e36467)
 - [git](https://git-scm.com/)
 
 Clone the repo.
 
 ```cmd
-git clone -b stable --depth 1 https://github.com/JacobDev1/xl-converter.git
+git clone -b stable --depth 1 https://github.com/K4sum1/xl-converter.git
 cd xl-converter
-```
-
-[Provide tool binaries](#providing-tool-binaries).
-
-Setup `venv`.
-
-```cmd
-python -m venv env_build
-env_build\Scripts\activate.bat
-pip install -r requirements.txt
-```
-
-Install [redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe)
-
-Run the application.
-
-```cmd
-python main.py
-```
-
-#### Building
-
-Bundling requires recompiling the bootloader to prevent Windows from deleting the EXE (due to [false positives](https://github.com/pyinstaller/pyinstaller/blob/master/.github/ISSUE_TEMPLATE/antivirus.md)).
-
-Install MSYS2 and launch MINGW64.
-
-```bash
-pacman -Syu
-pacman -S --needed git cmake mingw-w64-x86_64-gcc
-```
-
-Close the MSYS2 terminal and launch CMD inside project's root directory.
-
-Clone PyInstaller.
-
-```cmd
-env_build\Scripts\activate
-git clone -b v6.11.1 --depth 1 https://github.com/pyinstaller/pyinstaller.git misc\pyinstaller
-```
-
-Recompile the bootloader.
-
-```cmd
-cd misc\pyinstaller\bootloader
-set PATH=C:\msys64\mingw64\bin;%PATH%
-python waf all --gcc
-cd ..
-pip install .
-cd ..\..
-```
-
-Reload the environment to avoid the `ModuleNotFoundError` error.
-
-```cmd
-env_build\Scripts\activate
-```
-
-Bundle:
-
-```cmd
-python build.py
-```
-
-### Linux (Ubuntu-based)
-
-Install packages.
-
-```bash
-sudo apt update
-sudo apt install git make curl fuse p7zip-full
-```
-
-Install [xcb QPA](https://doc.qt.io/qt-6/linux-requirements.html) dependencies.
-
-```bash
-sudo apt install '^libxcb.*-dev' libfontconfig1-dev libfreetype6-dev libx11-dev libx11-xcb-dev libxext-dev libxfixes-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
-```
-
-Install [pyenv](https://github.com/pyenv/pyenv) via [Automatic installer](https://github.com/pyenv/pyenv?tab=readme-ov-file#automatic-installer) then [add it to shell](https://github.com/pyenv/pyenv?tab=readme-ov-file#set-up-your-shell-environment-for-pyenv)
-
-Install Python build packages.
-
-```bash
-sudo apt install wget build-essential libreadline-dev libncursesw5-dev libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev liblzma-dev
-```
-
-Build and setup Python `3.11.10`.
-
-```bash
-pyenv install 3.11.10
-pyenv global 3.11.10
-```
-
-Clone and set up the repo.
-
-```bash
-git clone -b stable --depth 1 https://github.com/JacobDev1/xl-converter.git
-chmod -R +x xl-converter
-cd xl-converter
-```
-
-[Provide tool binaries](#providing-tool-binaries).
-
-Create and activate a virtual environment.
-
-```bash
-python -m venv env_build
-source env_build/bin/activate
-```
-
-Install Python dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-Now, you can run it.
-
-```bash
-python main.py
-```
-
-#### Building
-
-Recompile the bootloader:
-
-```bash
-source env_build/bin/activate
-git clone -b v6.11.1 --depth 1 https://github.com/pyinstaller/pyinstaller.git misc/pyinstaller
-cd misc/pyinstaller/bootloader
-python waf all --gcc
-cd ..
-pip install .
-cd ../..
-```
-
-Reload the environment to avoid the `ModuleNotFoundError` error.
-
-```bash
-source env_build/bin/activate
-```
-
-Build:
-
-```bash
-python build.py
 ```
 
 ### Providing Tool Binaries
@@ -217,24 +69,6 @@ Libraries:
 - [oxipng](https://github.com/shssoichiro/oxipng) `v9.1.4`
 
 Below you'll find references on how to arrange the binaries. You will also need to add dependencies alongside them.
-
-#### Linux (x86_64)
-
-```bash
-./xl-converter/bin/linux/
-├── avifdec
-├── avifenc
-├── cjpegli
-├── cjxl
-├── djxl
-├── imagemagick
-│   └── magick
-├── jpegtran
-├── jxlinfo
-└── oxipng
-```
-
-#### Windows (x86_64)
 
 ```bash
 ./xl-converter/bin/win/
@@ -257,13 +91,71 @@ Below you'll find references on how to arrange the binaries. You will also need 
     └── oxipng.exe
 ```
 
-On Windows, I recommend using MSYS2 MINGW64 for building.
-
-> [!NOTE]
-> When building `libjpeg-turbo`, embed [this manifest](https://github.com/AOMediaCodec/libavif/blob/3ec01cefd1ddd266a622d5e114a0888581b68f4a/apps/utf8.manifest) into `jpegtran.exe` with `mt.exe` from Visual Studio. This enables a UTF-8 support in arguments.
+I recommend using MSYS2 MINGW32 for building.
 
 > [!TIP]
 > Use `ldd` in MSYS2 to check which DLLs need bundling alongside the executables.
+
+### Setup
+
+Setup `venv`.
+
+```cmd
+python -m venv env_build
+env_build\Scripts\activate.bat
+pip install -r requirements.txt
+```
+
+Install [redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe)
+
+Run the application.
+
+```cmd
+python main.py
+```
+
+#### Building
+
+Bundling requires recompiling the bootloader to prevent Windows from deleting the EXE (due to [false positives](https://github.com/pyinstaller/pyinstaller/blob/master/.github/ISSUE_TEMPLATE/antivirus.md)).
+
+Install MSYS2 and launch MINGW32.
+
+```bash
+pacman -Syu
+pacman -S --needed git cmake mingw-w64-i686-gcc
+```
+
+Close the MSYS2 terminal and launch CMD inside project's root directory.
+
+Clone PyInstaller.
+
+```cmd
+env_build\Scripts\activate
+git clone -b v6.11.1 --depth 1 https://github.com/pyinstaller/pyinstaller.git misc\pyinstaller
+```
+
+Recompile the bootloader.
+
+```cmd
+cd misc\pyinstaller\bootloader
+set PATH=C:\msys64\mingw32\bin;%PATH%
+python waf all --gcc
+cd ..
+pip install .
+cd ..\..
+```
+
+Reload the environment to avoid the `ModuleNotFoundError` error.
+
+```cmd
+env_build\Scripts\activate
+```
+
+Bundle:
+
+```cmd
+python build.py
+```
 
 ## Info
 
@@ -278,7 +170,7 @@ Create a test environment.
 
 ```bash
 python -m venv env_dev
-source env_dev/bin/activate
+env_dev\Scripts\activate
 pip install -r requirements.txt -r requirements_test.txt
 ```
 
@@ -293,15 +185,6 @@ You can control which tests to run. Run `python test.py --help` to learn more.
 ### Functional Tests
 
 `test_convert.py` is a separate test suite focusing on validating program's output.
-
-#### Linux
-
-```bash
-sudo apt install xvfb
-make test-convert
-```
-
-#### Windows
 
 ```bash
 python test_convert.py

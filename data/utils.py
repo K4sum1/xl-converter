@@ -1,16 +1,19 @@
-from typing import Any, Union
+from typing import Any, List, Union
 from collections.abc import Hashable
 import os
 
-def removeDuplicatesHashable(data: list[Hashable]) -> list[Hashable]:
+def removeDuplicatesHashable(data: List[Any]):
     """Removes duplicates from a list while preserving order. All entries must be hashable.
     
     Hashable: str, int, float, tuple
     Unhashable: list, dict, set
     """ 
+    if not all(isinstance(x, (str, int, float, tuple)) for x in data):
+        raise TypeError("Input contains unhashable elements")
+
     return list(dict.fromkeys(data))
 
-def listToFilter(title: str, ext: list[str]) -> str:
+def listToFilter(title: str, ext: List[str]):
     """Convert a list of extensions into a name filter for file dialogs."""
     if len(ext) == 0:
         return f"All Files (*)"

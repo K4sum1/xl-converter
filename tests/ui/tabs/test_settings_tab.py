@@ -10,11 +10,11 @@ from ui.tabs.settings_tab import SettingsTab
 
 @pytest.fixture
 def app(qtbot):
-    with (
-        patch("ui.tabs.settings_tab.WidgetManager.loadState"),
-        patch("ui.tabs.settings_tab.WidgetManager.saveState"),
-        patch("ui.tabs.settings_tab.setTheme"),
-    ):
+    with \
+        patch("ui.tabs.settings_tab.WidgetManager.loadState"), \
+        patch("ui.tabs.settings_tab.WidgetManager.saveState"), \
+        patch("ui.tabs.settings_tab.setTheme"):
+
         tab = SettingsTab()
         qtbot.addWidget(tab)
         return tab
@@ -152,10 +152,10 @@ def test_onAVIFBitDepthChanged_var_not_found(onAVIFBitDepthChanged_patches):
     mocks["avif_bit_depth_cmb.setCurrentText"].assert_called_once_with("Auto")
 
 def test_onThemeChanged(app):
-    with (
-        patch.object(app.theme_cmb, "currentText", return_value="theme") as mock_currentText,
-        patch("ui.tabs.settings_tab.setTheme") as mock_setTheme,
-    ):
+    with \
+        patch.object(app.theme_cmb, "currentText", return_value="theme") as mock_currentText, \
+        patch("ui.tabs.settings_tab.setTheme") as mock_setTheme:
+
         app.onThemeChanged()
         mock_setTheme.assert_called_once_with(mock_currentText.return_value)
 

@@ -2,7 +2,7 @@ import os
 import shutil
 import copy
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List, Union
 import platform
 
 from PySide6.QtCore import (
@@ -112,15 +112,14 @@ class Worker(QRunnable):
             
             self.runDynamicRamOptimizer()
 
-            match self.params["format"]:
-                case "Lossless JPEG Transcoding":
-                    self.losslesslyTranscodeJPEG()
-                case "JPEG Reconstruction":
-                    self.reconstructJPEG()
-                case "Smallest Lossless":
-                    self.smallestLossless()
-                case _:
-                    self.convert()
+            if self.params["format"] == "Lossless JPEG Transcoding":
+                self.losslesslyTranscodeJPEG()
+            elif self.params["format"] == "JPEG Reconstruction":
+                self.reconstructJPEG()
+            elif self.params["format"] == "Smallest Lossless":
+                self.smallestLossless()
+            else:
+                self.convert()
             
             self.finishConversion()
             self.postConversionRoutines()
@@ -239,91 +238,89 @@ class Worker(QRunnable):
         encoder = None
 
         # Prepare args
-        match self.params["format"]:
-            case "JPEG XL":
-                args = ["" for i in range(4)]   # Legacy
+        if self.params["format"] == "JPEG XL":
+            args = ["" for i in range(4)]   # Legacy
 
-                if self.params["lossless"]:
-                    args[0] = "-q 100"
-                    if self.settings["jxl_auto_lossless_jpeg"]:
-                        args[2] = "--lossless_jpeg=1"
-                        if self.item_ext in JPEG_ALIASES:
-                            self.lossless_jpeg = True
-                    else:
-                        args[2] = "--lossless_jpeg=0"
+            if self.params["lossless"]:
+                args[0] = "-q 100"
+                if self.settings["jxl_auto_lossless_jpeg"]:
+                    args[2] = "--lossless_jpeg=1"
+                    if self.item_ext in JPEG_ALIASES:
+                        self.lossless_jpeg = True
                 else:
-                    args[0] = f"-q {self.params['quality']}"
                     args[2] = "--lossless_jpeg=0"
+            else:
+                args[0] = f"-q {self.params['quality']}"
+                args[2] = "--lossless_jpeg=0"
 
-                args[1] = f"-e {self.params['effort']}"
-                args[3] = f"--num_threads={self.available_threads}"
+            args[1] = f"-e {self.params['effort']}"
+            args[3] = f"--num_threads={self.available_threads}"
 
-                if self.params["intelligent_effort"] and (self.params["lossless"] or self.params["jxl_modular"]):
-                    self.params["intelligent_effort"] = False
-                    args[1] = "-e 9"
+            if self.params["intelligent_effort"] and (self.params["lossless"] or self.params["jxl_modular"]):
+                self.params["intelligent_effort"] = False
+                args[1] = "-e 9"
 
-                if not self.params["lossless"] and self.params["jxl_modular"]:
-                    args.append("--modular=1")
+            if not self.params["lossless"] and self.params["jxl_modular"]:
+                args.append("--modular=1")
 
-                encoder = CJXL_PATH
-            case "AVIF":
-                args = [
-                    f"-q {self.params['quality']}",
-                    f"-s {self.params['effort']}",
-                    f"-j {self.available_threads}",
-                ]
-                match self.settings["avif_encoder"]:
-                    case "AOM AV1":
-                        args.append("-c aom")
-                        if self.params["aom_av1_chroma_subsampling"] != "Default":
-                            args.append(f"-y {self.params['aom_av1_chroma_subsampling'].replace(':', '')}")
-                        if self.settings["avif_aom_iq_tune"]:  # libaom version >= v3.12.0
-                            args.append("-a tune=iq")
-                    case "SVT-AV1-PSY":             # Assuming SVT-AV1 was swapped before compilation
-                        args.append("-c svt")
-                        args.append("-y 420")       # SVT-AV1 only supports YUV:4:2:0
-                        args.append("-a tune=4")    # Still image tuning
-                    case _:
-                        raise GenericException("C4", "Unrecognized AVIF encoder.")
+            encoder = CJXL_PATH
+        elif self.params["format"] == "AVIF":
+            args = [
+                f"-q {self.params['quality']}",
+                f"-s {self.params['effort']}",
+                f"-j {self.available_threads}",
+            ]
+            if self.settings["avif_encoder"] == "AOM AV1":
+                args.append("-c aom")
+                if self.params["aom_av1_chroma_subsampling"] != "Default":
+                    args.append(f"-y {self.params['aom_av1_chroma_subsampling'].replace(':', '')}")
+                if self.settings["avif_aom_iq_tune"]:  # libaom version >= v3.12.0
+                    args.append("-a tune=iq")
+            elif self.settings["avif_encoder"] == "SVT-AV1-PSY":
+                args.append("-c svt")
+                args.append("-y 420")       # SVT-AV1 only supports YUV:4:2:0
+                args.append("-a tune=4")    # Still image tuning
+            else:
+                raise GenericException("C4", "Unrecognized AVIF encoder.")
 
-                if self.settings["avif_bit_depth"] != "Auto":
-                    args.append(f"-d {self.settings['avif_bit_depth']}")
+            if self.settings["avif_bit_depth"] != "Auto":
+                args.append(f"-d {self.settings['avif_bit_depth']}")
 
-                encoder = AVIFENC_PATH
-            case "JPEG":
-                if self.settings["jpg_encoder"] == "JPEGLI":
-                    args = [f"-q {self.params['quality']}"]
-                    if self.settings["disable_progressive_jpegli"]:
-                        args.append("-p 0")
-                    if self.params["jpegli_chroma_subsampling"] != "Default":
-                        args.append(f"--chroma_subsampling={self.params['jpegli_chroma_subsampling'].replace(':', '')}")
+            encoder = AVIFENC_PATH
+        elif self.params["format"] == "JPEG":
+            if self.settings["jpg_encoder"] == "JPEGLI":
+                args = [f"-q {self.params['quality']}"]
+                if self.settings["disable_progressive_jpegli"]:
+                    args.append("-p 0")
+                if self.params["jpegli_chroma_subsampling"] != "Default":
+                    args.append(f"--chroma_subsampling={self.params['jpegli_chroma_subsampling'].replace(':', '')}")
 
-                    encoder = CJPEGLI_PATH
-                else:
-                    args = [f"-quality {self.params['quality']}"]
-                    if self.params["jpg_chroma_subsampling"] != "Default":
-                        args.append(f"-sampling-factor {self.params['jpg_chroma_subsampling']}")
-                    
-                    encoder = IMAGE_MAGICK_PATH
-            case "WebP":
-                args = []
-
-                if self.params["lossless"]:
-                    args.append("-define webp:lossless=true")
-                else:
-                    args.append(f"-quality {self.params['quality']}")
+                encoder = CJPEGLI_PATH
+            else:
+                args = [f"-quality {self.params['quality']}"]
+                if self.params["jpg_chroma_subsampling"] != "Default":
+                    args.append(f"-sampling-factor {self.params['jpg_chroma_subsampling']}")
                 
-                args.extend([
-                    f"-define webp:thread-level={1 if self.available_threads > 1 else 0}",
-                    f"-define webp:method={self.params['effort']}"
-                ])
-
                 encoder = IMAGE_MAGICK_PATH
-            case "PNG":
-                encoder = getDecoder(self.item_ext)
-                args = getDecoderArgs(encoder, self.available_threads)
-            case _:
-                raise GenericException("C0", f"Unknown format ({self.params['format']})")
+        elif self.params["format"] == "WebP":
+            args = []
+
+            if self.params["lossless"]:
+                args.append("-define webp:lossless=true")
+            else:
+                args.append(f"-quality {self.params['quality']}")
+            
+            args.extend([
+                f"-define webp:thread-level={1 if self.available_threads > 1 else 0}",
+                f"-define webp:method={self.params['effort']}"
+            ])
+
+            encoder = IMAGE_MAGICK_PATH
+        elif self.params["format"] == "PNG":
+            encoder = getDecoder(self.item_ext)
+            args = getDecoderArgs(encoder, self.available_threads)
+        else:
+            raise GenericException("C0", f"Unknown format ({self.params['format']})")
 
         # Prepare metadata
         args.extend(metadata.getArgs(encoder, self.params["misc"]["keep_metadata"], self.lossless_jpeg))
@@ -547,7 +544,7 @@ class Worker(QRunnable):
         delete_if_canceled = list(path_pool.values())
         delete_if_canceled.append(self.item_abs_path)   # Points to proxy
 
-        def _runBinary(encoder_path: str, args: str, src: str, dst: str | None = None, args_after_input=False, delete_if_canceled: list[str] = []) -> None:
+        def _runBinary(encoder_path: str, args: str, src: str, dst: Union[str, None] = None, args_after_input=False, delete_if_canceled: List[str] = []) -> None:
             out, err = runBinary(encoder_path, args, src, dst, args_after_input=args_after_input, delete_if_canceled=delete_if_canceled)
             if dst is not None and not os.path.isfile(dst):
                 cleanUp(delete_if_canceled)

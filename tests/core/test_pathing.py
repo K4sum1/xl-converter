@@ -83,42 +83,43 @@ def test_UniquePathStore_mutex_release(UniquePathStore):
     ("image (10)", "jxl", Path("/home/user/images"), [True, True, False, False], [True, False], Path("/home/user/images/image (12).jxl")),
 ])
 def test_getUniqueFilePath(file_name, file_ext, output_dir, isfile_side_effect, exists_side_effect, expected_path):
-    with (
-        patch("os.path.isfile", side_effect=isfile_side_effect),
-        patch("core.pathing.UniquePathStore.exists", side_effect=exists_side_effect),
-    ):
+    with \
+        patch("os.path.isfile", side_effect=isfile_side_effect) as mock_isfile, \
+        patch("core.pathing.UniquePathStore.exists", \
+        side_effect=exists_side_effect) as mock_exists:
+
         assert pathing.getUniqueFilePath(str(output_dir), file_name, file_ext) == str(expected_path)
 
 def test_getUniqueTmpFilePath_happy_path():
-    with (
-        patch("core.pathing.os.path.isfile", return_value=False),
-        patch("core.pathing.UniquePathStore.exists", return_value=False),
-        patch("core.pathing.secrets.token_hex", return_value="abcdef12"),
-    ):
+    with \
+        patch("core.pathing.os.path.isfile", return_value=False) as mock_isfile, \
+        patch("core.pathing.UniquePathStore.exists", return_value=False) as mock_exists, \
+        patch("core.pathing.secrets.token_hex", return_value="abcdef12") as mock_token_hex:
+
         pathing.getUniqueTmpFilePath(str(Path("/tmp")), "jpg") == str(Path("/tmp", f"tmp_abcdef12.jpg"))
 
 def test_getUniqueTmpFilePath_isfile_true():
-    with (
-        patch("core.pathing.os.path.isfile", side_effect=[True, False]),
-        patch("core.pathing.UniquePathStore.exists", return_value=False),
-        patch("core.pathing.secrets.token_hex", side_effect=["1"*8, "2"*8]),
-    ):
+    with \
+        patch("core.pathing.os.path.isfile", side_effect=[True, False]) as mock_isfile, \
+        patch("core.pathing.UniquePathStore.exists", return_value=False) as mock_exists, \
+        patch("core.pathing.secrets.token_hex", side_effect=["1"*8, "2"*8]) as mock_token_hex:
+
         pathing.getUniqueTmpFilePath(str(Path("/tmp")), "jpg") == str(Path("/tmp", f"tmp_{'2'*8}.jpg"))
 
 def test_getUniqueTmpFilePath_path_store_exists():
-    with (
-        patch("core.pathing.os.path.isfile", return_value=False),
-        patch("core.pathing.UniquePathStore.exists", side_effect=[True, False]),
-        patch("core.pathing.secrets.token_hex", side_effect=["1"*8, "2"*8]),
-    ):
+    with \
+        patch("core.pathing.os.path.isfile", return_value=False) as mock_isfile, \
+        patch("core.pathing.UniquePathStore.exists", side_effect=[True, False]) as mock_exists, \
+        patch("core.pathing.secrets.token_hex", side_effect=["1"*8, "2"*8]) as mock_token_hex:
+
         pathing.getUniqueTmpFilePath(str(Path("/tmp")), "jpg") == str(Path("/tmp", f"tmp_{'2'*8}.jpg"))
 
 def test_getUniqueTmpFilePath_path_store_exists_and_isfile_true():
-    with (
-        patch("core.pathing.os.path.isfile", side_effect=[True, False, False]),
-        patch("core.pathing.UniquePathStore.exists", side_effect=[True, False]),
-        patch("core.pathing.secrets.token_hex", side_effect=["1"*8, "2"*8, "3"*8]),
-    ):
+    with \
+        patch("core.pathing.os.path.isfile", side_effect=[True, False, False]) as mock_isfile, \
+        patch("core.pathing.UniquePathStore.exists", side_effect=[True, False]) as mock_exists, \
+        patch("core.pathing.secrets.token_hex", side_effect=["1"*8, "2"*8, "3"*8]) as mock_token_hex:
+
         pathing.getUniqueTmpFilePath(str(Path("/tmp")), "jpg") == str(Path("/tmp", f"tmp_{'3'*8}.jpg"))
 
 @pytest.mark.parametrize("file_format, extension", [
