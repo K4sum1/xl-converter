@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import(
+from PySide2.QtWidgets import(
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
@@ -7,7 +7,7 @@ from PySide6.QtWidgets import(
     QSizePolicy,
     QWidget,
 )
-from PySide6.QtCore import(
+from PySide2.QtCore import(
     Qt,
     QUrl,
 )

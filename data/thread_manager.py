@@ -1,6 +1,6 @@
 import logging
 
-from PySide6.QtCore import QThreadPool
+from PySide2.QtCore import QThreadPool
 
 from core.ram_optimizer import RAMOptimizer
 

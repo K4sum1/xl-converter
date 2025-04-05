@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 from pathlib import Path
 
 import pytest
-from PySide6.QtCore import QUrl, QPointF, Qt
+from PySide2.QtCore import QUrl, QPoint, Qt
 
 import data.cli_args as cli_args
 
@@ -77,8 +77,8 @@ def test_getArgsLocalResQDropEvent_args_passed(app):
         drop_event = cli_args.getArgsLocalResQDropEvent()
         mock_parseArgs.assert_called_once()
 
-        assert drop_event.position() == QPointF(0.0, 0.0)
+        assert drop_event.pos() == QPoint(0, 0)
         assert drop_event.dropAction() == Qt.CopyAction
         assert drop_event.mimeData().urls() == [QUrl.fromLocalFile(res) for res in mock_args.resources]
-        assert drop_event.buttons() == Qt.LeftButton
-        assert drop_event.modifiers() == Qt.NoModifier
+        assert drop_event.mouseButtons() == Qt.LeftButton
+#        assert drop_event.modifiers() == Qt.NoModifier

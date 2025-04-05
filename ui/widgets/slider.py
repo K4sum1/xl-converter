@@ -1,6 +1,6 @@
-from PySide6.QtGui import QKeyEvent, QMouseEvent, QWheelEvent
-from PySide6.QtWidgets import QSlider
-from PySide6.QtCore import Qt
+from PySide2.QtGui import QKeyEvent, QMouseEvent, QWheelEvent
+from PySide2.QtWidgets import QSlider
+from PySide2.QtCore import Qt
 
 class Slider(QSlider):
     def __init__(self, orientation=Qt.Horizontal):

@@ -3,7 +3,7 @@ from unittest.mock import patch, MagicMock
 from contextlib import ExitStack
 
 import pytest
-from PySide6.QtCore import QThreadPool
+from PySide2.QtCore import QThreadPool
 
 import core.ram_optimizer as ram_optimizer
 from core.ram_optimizer import RAMOptimizer, OptimizationRule

@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import pytest
-from PySide6.QtWidgets import QMessageBox
+from PySide2.QtWidgets import QMessageBox
 
 from ui.dialogs.notifications import Notifications
 

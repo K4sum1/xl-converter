@@ -1,5 +1,5 @@
-from PySide6.QtGui import QWheelEvent
-from PySide6.QtWidgets import QComboBox, QWidget
+from PySide2.QtGui import QWheelEvent
+from PySide2.QtWidgets import QComboBox, QWidget
 from typing import Tuple, Union
 
 class ComboBox(QComboBox):

@@ -3,12 +3,21 @@ from unittest.mock import MagicMock, patch, call
 from contextlib import ExitStack, contextmanager
 
 import pytest
-from PySide6.QtCore import QMutex
-from PySide6.QtTest import QSignalSpy
+from PySide2.QtCore import QMutex, QObject, Slot
+#from PySide2.QtTest import QSignalSpy
 
 from core.worker import Worker
 from core.proxy import Proxy
 from core.exceptions import FileException, GenericException, CancellationException
+
+class SignalCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = False
+
+    @Slot()
+    def on_signal(self):
+        self.signal_emitted = True
 
 @pytest.fixture
 def worker():

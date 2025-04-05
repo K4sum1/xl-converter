@@ -1,7 +1,7 @@
 import logging
 
 import requests
-from PySide6.QtCore import(
+from PySide2.QtCore import(
     QObject,
     Signal,
     QThread,

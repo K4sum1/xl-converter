@@ -1,6 +1,6 @@
 import os
 
-from PySide6.QtCore import (
+from PySide2.QtCore import (
     QMutexLocker,
 )
 

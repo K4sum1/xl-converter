@@ -1,8 +1,8 @@
 from unittest.mock import patch, ANY, MagicMock
 
 import pytest
-from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import Qt, QDir
+from PySide2.QtWidgets import QApplication
+from PySide2.QtCore import Qt, QDir
 
 from ui.tabs.output_tab import OutputTab
 

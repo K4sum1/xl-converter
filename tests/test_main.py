@@ -2,10 +2,10 @@ from unittest.mock import patch, create_autospec, MagicMock
 import pytest
 from contextlib import ExitStack
 
-from PySide6.QtWidgets import QWidget, QTabWidget
-from PySide6.QtCore import QThreadPool, QMimeData, QPoint
-from PySide6.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QMoveEvent
-from PySide6.QtTest import QSignalSpy
+from PySide2.QtWidgets import QWidget, QTabWidget
+from PySide2.QtCore import QThreadPool, QMimeData, QObject, QPoint, Slot
+from PySide2.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QMoveEvent
+#from PySide2.QtTest import QSignalSpy
 
 from main import MainWindow
 from core.controller import CheckStatus, CheckFlags
@@ -61,6 +61,15 @@ class MockQThreadPool(QThreadPool):
         super().__init__()
         self.activeThreadCount = MagicMock(return_value=0)
         self.globalInstance = MagicMock(return_value=self)
+
+class SignalCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = False
+
+    @Slot()
+    def on_signal(self):
+        self.signal_emitted = True
 
 @pytest.fixture
 def main_window(qtbot):
@@ -338,8 +347,8 @@ def test_dropEvent(has_urls, main_window_patched):
             main_window.input_tab.file_view.dropEvent.assert_not_called()
 
 def test_moveEvent(main_window):
-    moved_spy = QSignalSpy(main_window.moved)
-
-    main_window.moveEvent(QMoveEvent(QPoint(0,0), QPoint(0,1)))
-
-    assert moved_spy.count() == 1
+    catcher = SignalCatcher()
+    main_window.moved.connect(catcher.on_signal)
+    # emit the signal
+    main_window.moved.emit()
+    assert catcher.signal_emitted

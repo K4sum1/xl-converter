@@ -2,9 +2,9 @@ from unittest.mock import patch, MagicMock
 from pathlib import Path
 
 import pytest
-from PySide6.QtWidgets import QApplication, QStyle, QStyleOptionViewItem
-from PySide6.QtCore import Qt, QMimeData, QUrl, QModelIndex, QItemSelectionModel
-from PySide6.QtGui import QPainter
+from PySide2.QtWidgets import QApplication, QStyle, QStyleOptionViewItem
+from PySide2.QtCore import Qt, QMimeData, QUrl, QModelIndex, QItemSelectionModel
+from PySide2.QtGui import QPainter
 
 import ui.widgets.file_view as file_view_module
 

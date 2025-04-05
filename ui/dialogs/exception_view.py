@@ -2,7 +2,7 @@ import csv
 import platform
 import os
 
-from PySide6.QtWidgets import (
+from PySide2.QtWidgets import (
     QDialog,
     QVBoxLayout,
     QHBoxLayout,
@@ -16,11 +16,11 @@ from PySide6.QtWidgets import (
     QStyledItemDelegate,
     QStyle,
 )
-from PySide6.QtCore import (
+from PySide2.QtCore import (
     Qt,
     QUrl,
 )
-from PySide6.QtGui import (
+from PySide2.QtGui import (
     QIcon,
 )
 

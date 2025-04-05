@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Union
 import platform
 
-from PySide6.QtCore import (
+from PySide2.QtCore import (
     QRunnable,
     QObject,
     Signal,

@@ -126,7 +126,8 @@ def getStyleSheet(theme: Theme) -> str:
 
     QTabBar::tab {{
         background-color: transparent;
-        padding: 7px;
+        padding: 7px 0px;
+        min-width: 70px;
         margin-right: 10px;
         font-size: 14px;
         font-weight: 400;
@@ -247,7 +248,7 @@ def getStyleSheet(theme: Theme) -> str:
     QTreeView>QHeaderView::section {{
         color: {theme.colors.font};
         background-color: {theme.colors.border};
-        font-weight: 600;
+        font-weight: 500;
         text-align: left;
         border: none;
         padding: 3px 3px 3px 13px;

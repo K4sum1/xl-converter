@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import(
+from PySide2.QtWidgets import(
     QDialog,
     QPushButton,
     QVBoxLayout,
@@ -6,13 +6,13 @@ from PySide6.QtWidgets import(
     QLabel,
     QSizePolicy,
 )
-from PySide6.QtCore import(
+from PySide2.QtCore import(
     Qt,
     QUrl,
     QObject,
     Signal,
 )
-from PySide6.QtGui import(
+from PySide2.QtGui import(
     QGuiApplication,
     QIcon,
 )

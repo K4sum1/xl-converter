@@ -1,10 +1,19 @@
 from unittest.mock import patch, MagicMock
 
 import pytest
-from PySide6.QtCore import QTimer
-from PySide6.QtTest import QSignalSpy
+from PySide2.QtCore import QObject, QTimer, Slot
+#from PySide2.QtTest import QSignalSpy
 
 from data.time_left import TimeLeft
+
+class SignalCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = False
+
+    @Slot()
+    def on_signal(self):
+        self.signal_emitted = True
 
 @pytest.fixture
 def time_left():

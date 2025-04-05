@@ -3,8 +3,8 @@ from contextlib import ExitStack
 import logging
 
 import pytest
-from PySide6.QtWidgets import QApplication, QCheckBox, QComboBox
-from PySide6.QtCore import Qt
+from PySide2.QtWidgets import QApplication, QCheckBox, QComboBox
+from PySide2.QtCore import Qt
 
 from ui.tabs.settings_tab import SettingsTab
 

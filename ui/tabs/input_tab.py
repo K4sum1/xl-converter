@@ -3,19 +3,19 @@ import logging
 from typing import List, Tuple, Union
 import os
 
-from PySide6.QtWidgets import(
+from PySide2.QtWidgets import(
     QWidget,
     QGridLayout,
     QPushButton,
-    QFileDialog
+    QFileDialog,
+    QShortcut,
 )
-from PySide6.QtCore import(
+from PySide2.QtCore import(
     Signal,
     QUrl,
     QDir,
 )
-from PySide6.QtGui import(
-    QShortcut,
+from PySide2.QtGui import(
     QKeySequence,
 )
 

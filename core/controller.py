@@ -6,7 +6,7 @@ from pathlib import Path
 from dataclasses import dataclass, field
 from enum import Enum, auto
 
-from PySide6.QtCore import (
+from PySide2.QtCore import (
     QThreadPool,
     QMutex,
     Signal,

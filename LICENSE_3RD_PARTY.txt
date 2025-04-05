@@ -35,7 +35,7 @@ send2trash
 - License: BSD-3-Clause
 - URL: https://github.com/arsenetar/send2trash/blob/master/LICENSE
 
-PySide6
+PySide2
 - License: GNU Lesser General Public License (LGPL) version 3
 - URL: https://doc.qt.io/qtforpython/licenses.html
 

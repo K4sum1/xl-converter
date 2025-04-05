@@ -1,9 +1,9 @@
 from unittest.mock import patch, call
 
 import pytest
-from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import Qt, QPointF, QPoint
-from PySide6.QtGui import QMouseEvent, QCursor
+from PySide2.QtWidgets import QApplication
+from PySide2.QtCore import Qt, QPointF, QPoint
+from PySide2.QtGui import QMouseEvent, QCursor
 
 from ui.widgets.scroll_area import ScrollArea
 
@@ -56,4 +56,4 @@ def test_mouseMoveEvent(app):
     app.mousePressEvent(QMouseEvent(QMouseEvent.MouseButtonPress, QPointF(0, 0), QCursor.pos(), Qt.LeftButton, Qt.LeftButton, Qt.NoModifier))
     app.mouseMoveEvent(QMouseEvent(QMouseEvent.MouseMove, QPointF(0, 100), QCursor.pos(), Qt.LeftButton, Qt.LeftButton, Qt.NoModifier))
 
-    assert app.last_position.y() == 100
+    assert app.last_position().y() == 100

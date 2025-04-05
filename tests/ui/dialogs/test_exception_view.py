@@ -2,11 +2,11 @@ from unittest.mock import patch, MagicMock, mock_open
 import platform
 import csv
 
-from PySide6.QtWidgets import (
+from PySide2.QtWidgets import (
     QTreeWidgetItem,
     QFileDialog,
 )
-from PySide6.QtCore import (
+from PySide2.QtCore import (
     Qt,
 )
 import pytest

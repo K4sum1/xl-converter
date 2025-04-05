@@ -4,9 +4,9 @@ import logging
 from contextlib import contextmanager
 import traceback
 
-from PySide6.QtWidgets import QWidget, QHBoxLayout
-from PySide6.QtCore import QUrl, QObject
-from PySide6.QtGui import QDesktopServices
+from PySide2.QtWidgets import QWidget, QHBoxLayout
+from PySide2.QtCore import QUrl, QObject
+from PySide2.QtGui import QDesktopServices
 
 from core.process import runProcess
 from data.tooltips import TOOLTIPS

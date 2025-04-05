@@ -1,6 +1,6 @@
-from PySide6.QtWidgets import QProgressDialog
-from PySide6.QtGui import QIcon
-from PySide6.QtCore import Signal, QObject, QPoint
+from PySide2.QtWidgets import QProgressDialog
+from PySide2.QtGui import QIcon
+from PySide2.QtCore import Signal, QObject, QPoint
 
 from data.constants import ICON_SVG
 

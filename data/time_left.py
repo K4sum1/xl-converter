@@ -1,7 +1,7 @@
 import time
 import logging
 
-from PySide6.QtCore import QObject, Signal, QTimer
+from PySide2.QtCore import QObject, Signal, QTimer
 
 class TimeLeft(QObject):
     update_time_left = Signal(str)
