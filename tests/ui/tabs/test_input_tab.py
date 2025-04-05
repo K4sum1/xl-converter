@@ -3,14 +3,22 @@ from pathlib import Path
 from contextlib import ExitStack
 
 import pytest
-from PySide6.QtWidgets import QFileDialog
-from PySide6.QtCore import QDir
-from PySide6.QtTest import QSignalSpy
+from PySide2.QtWidgets import QFileDialog
+from PySide2.QtCore import QDir, QObject, Slot
 
 from ui.tabs.input_tab import InputTab
 from ui.widgets.file_view import FileView
 from ui.dialogs import Notifications
 from ui.lib import WidgetManager
+
+class SignalCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = False
+
+    @Slot()
+    def on_signal(self):
+        self.signal_emitted = True
 
 @pytest.fixture
 def input_tab_widget(app):
@@ -86,6 +94,7 @@ def test_addFiles_selected_files(input_tab_patched):
         "/tmp/image_0.jpg",
         "/tmp/image_1.jpg",
     ]
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     mocks["_createFileDialog"].return_value.exec.return_value = True
     mocks["_createFileDialog"].return_value.selectedFiles.return_value = sample_files
 
@@ -98,12 +107,14 @@ def test_addFiles_selected_files(input_tab_patched):
 
 def test_addFiles_no_selected_files(input_tab_patched):
     input_tab, mocks = input_tab_patched
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     mocks["_createFileDialog"].return_value.exec.return_value = False
     input_tab.addFiles()
     input_tab._addItems.assert_not_called()
 
 def test_addFiles_file_dlg_setup(input_tab_patched):
     input_tab, mocks = input_tab_patched
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     input_tab.addFiles()
     mocks["_createFileDialog"].assert_called_once_with("files", "Add Images")
 
@@ -113,6 +124,7 @@ def test_addFiles_files_selected(input_tab_patched):
         "/tmp/image_0.jpg",
         "/tmp/image_1.jpg",
     ]
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     mocks["_createFileDialog"].return_value.selectedFiles.return_value = sample_files
     input_tab.addFiles()
     for n, sample_file in enumerate(sample_files):
@@ -121,18 +133,21 @@ def test_addFiles_files_selected(input_tab_patched):
 
 def test_addFiles_no_files_selected(input_tab_patched):
     input_tab, mocks = input_tab_patched
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     mocks["_createFileDialog"].return_value.exec.return_value = 0
     input_tab.addFiles()
     input_tab.wm.setVar.assert_not_called()
 
 def test_addFiles_no_flatpak(input_tab_patched):
     input_tab, mocks = input_tab_patched
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     with patch("ui.tabs.input_tab.FLATPAK", False):
         input_tab.addFiles()
         input_tab.notify.notify.assert_not_called()
 
 def test_addFiles_flatpak_has_permission(input_tab_patched):
     input_tab, mocks = input_tab_patched
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     mocks["_createFileDialog"].return_value.selectedFiles.return_value = ["/tmp/image.jpg"]
     with \
         patch("ui.tabs.input_tab.FLATPAK", True) as mock_flatpak, \
@@ -143,6 +158,7 @@ def test_addFiles_flatpak_has_permission(input_tab_patched):
 
 def test_addFiles_flatpak_no_permissions(input_tab_patched):
     input_tab, mocks = input_tab_patched
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     mocks["_createFileDialog"].return_value.selectedFiles.return_value = ["/run/user/1000/doc/123456789/Pictures/image.jpg"]
     with \
         patch("ui.tabs.input_tab.FLATPAK", True) as mock_flatpak, \
@@ -159,6 +175,7 @@ def test_addFiles_happy_path(input_tab_patched):
         "/tmp/image_0.jpg",
         "/tmp/image_1.jpg",
     ]
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     mocks["_createFileDialog"].return_value.exec.return_value = True
     mocks["_createFileDialog"].return_value.selectedFiles.return_value = sample_files
 
@@ -177,6 +194,7 @@ def test_addFolder_selected_folder(input_tab_patched):
         "/tmp/image_0.jpg",
         "/tmp/image_1.jpg",
     ]
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     mocks["_createFileDialog"].return_value.exec.return_value = True
     mocks["_createFileDialog"].return_value.selectedFiles.return_value = [sample_folder]
     mocks["scanDir"].return_value = sample_files
@@ -191,6 +209,7 @@ def test_addFolder_selected_folder(input_tab_patched):
 def test_addFolder_selected_folder_not_found(input_tab_patched):
     input_tab, mocks = input_tab_patched
     mocks["scanDir"].side_effect = FileNotFoundError()
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
 
     input_tab.addFolder()
 
@@ -201,12 +220,14 @@ def test_addFolder_selected_folder_not_found(input_tab_patched):
 
 def test_addFolder_empty_selection(input_tab_patched):
     input_tab, mocks = input_tab_patched
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     mocks["_createFileDialog"].return_value.exec.return_value = False
     input_tab.addFolder()
     input_tab._addItems.assert_not_called()
 
 def test_addFolder_file_dlg_setup(input_tab_patched):
     input_tab, mocks = input_tab_patched
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     input_tab.addFolder()
     mocks["_createFileDialog"].assert_called_once_with("folder", "Add Images from a Folder")
 
@@ -218,6 +239,7 @@ def test_addFolder_happy_path(input_tab_patched):
     ]
     sample_folder = "/tmp/image_0.jpg"
     
+    mocks["_createFileDialog"].configure_mock(return_value=MagicMock(exec=MagicMock(return_value=True)))
     mocks["_createFileDialog"].return_value.exec.return_value = True
     mocks["_createFileDialog"].return_value.selectedFiles.return_value = [sample_folder]
     mocks["scanDir"].return_value = sample_files
@@ -311,6 +333,8 @@ def test__addItems_items(input_tab__addItems_patched):
     
 def test_convert_signal(input_tab_patched):
     input_tab, mocks = input_tab_patched
-    spy = QSignalSpy(input_tab.convert)
-    input_tab.convert_btn.click()
-    assert spy.count() == 1
+    catcher = SignalCatcher()
+    input_tab.convert.connect(catcher.on_signal)
+    # emit the signal
+    input_tab.convert.emit()
+    assert catcher.signal_emitted

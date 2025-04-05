@@ -6,17 +6,17 @@ from pathlib import Path
 import platform
 from unittest.mock import patch
 
-from PySide6.QtGui import (
+from PySide2.QtGui import (
     QDropEvent,
     QCloseEvent,
 )
-from PySide6.QtWidgets import (
+from PySide2.QtWidgets import (
     QApplication,
 )
-from PySide6.QtTest import (
+from PySide2.QtTest import (
     QTest,
 )
-from PySide6.QtCore import (
+from PySide2.QtCore import (
     Qt,
     QMimeData,
     QUrl,

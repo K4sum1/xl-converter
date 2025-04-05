@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-from PySide6.QtGui import (
+from PySide2.QtGui import (
     QFont,
     QFontDatabase,
 )

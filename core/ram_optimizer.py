@@ -4,7 +4,7 @@ from typing import List, Literal, Optional
 import os
 import re
 
-from PySide6.QtCore import (
+from PySide2.QtCore import (
     QThreadPool,
 )
 

@@ -2,7 +2,8 @@ from unittest.mock import patch
 import requests
 
 import pytest
-from PySide6.QtTest import QSignalSpy
+from PySide2.QtCore import QObject, Slot
+#from PySide2.QtTest import QSignalSpy
 
 from core.update_checker import (
     Worker,
@@ -10,6 +11,15 @@ from core.update_checker import (
     SIMULATE_SERVER_JSON
 )
 from data.constants import VERSION, UPDATE_CHECKER_VER_FILE_URL
+
+class SignalCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = False
+
+    @Slot()
+    def on_signal(self):
+        self.signal_emitted = True
 
 @pytest.fixture
 def worker():

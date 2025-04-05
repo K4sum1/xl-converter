@@ -3,14 +3,14 @@ from pathlib import Path
 import logging
 from typing import List, Tuple, Literal
 
-from PySide6.QtWidgets import(
+from PySide2.QtWidgets import(
     QTreeWidget,
     QAbstractItemView,
     QTreeWidgetItem,
     QStyledItemDelegate,
     QStyle,
 )
-from PySide6.QtCore import(
+from PySide2.QtCore import(
     Qt,
     QItemSelectionModel,
     QItemSelection,

@@ -3,13 +3,24 @@ from contextlib import ExitStack, contextmanager
 import logging
 
 import pytest
-from PySide6.QtCore import (
+from PySide2.QtCore import (
+    QObject,
     QThreadPool,
+    Slot,
 )
-from PySide6.QtTest import QSignalSpy
+#from PySide2.QtTest import QSignalSpy
 
 from core.controller import Controller, CheckFlags, CheckStatus
 from core.worker import Worker
+
+class SignalCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = False
+
+    @Slot()
+    def on_signal(self):
+        self.signal_emitted = True
 
 @pytest.fixture
 def controller():

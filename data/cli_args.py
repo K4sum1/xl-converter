@@ -3,8 +3,8 @@ from pathlib import Path
 import argparse
 from dataclasses import dataclass
 
-from PySide6.QtCore import QMimeData, QUrl, QPointF, Qt
-from PySide6.QtGui import QDropEvent
+from PySide2.QtCore import QMimeData, QUrl, QPointF, Qt
+from PySide2.QtGui import QDropEvent
 from typing import List, Union
 
 @dataclass

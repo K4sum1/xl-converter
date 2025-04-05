@@ -1,8 +1,8 @@
 from unittest.mock import patch
 
 import pytest
-from PySide6.QtWidgets import QApplication
-from PySide6.QtCore import Qt
+from PySide2.QtWidgets import QApplication
+from PySide2.QtCore import Qt
 
 from ui.tabs.about_tab import AboutTab
 
@@ -44,7 +44,7 @@ def test_update_btn_reenabled(about_tab, qtbot):
     "donate_btn",
 ])
 def test_openExternalLinks(button, about_tab, qtbot):
-    with patch("PySide6.QtGui.QDesktopServices.openUrl") as mock_openUrl:
+    with patch("PySide2.QtGui.QDesktopServices.openUrl") as mock_openUrl:
         btn_ref = getattr(about_tab, button, None)
         if btn_ref is None:
             assert False, f"Button \"{button}\" not found in AboutTab"

@@ -3,7 +3,7 @@ import logging
 from typing import Optional, Dict
 from copy import deepcopy
 
-from PySide6.QtWidgets import(
+from PySide2.QtWidgets import(
     QWidget,
     QGridLayout,
     QVBoxLayout,
@@ -17,7 +17,7 @@ from PySide6.QtWidgets import(
     QTextEdit,
     QComboBox,
 )
-from PySide6.QtCore import(
+from PySide2.QtCore import(
     Signal,
     QObject,
     Qt,

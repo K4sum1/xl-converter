@@ -2,7 +2,7 @@ from contextlib import ExitStack
 from unittest.mock import MagicMock, patch
 
 import pytest
-from PySide6.QtCore import QThreadPool
+from PySide2.QtCore import QThreadPool
 
 from data.thread_manager import ThreadManager
 

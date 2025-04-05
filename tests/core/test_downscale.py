@@ -2,7 +2,7 @@ import os
 from unittest.mock import patch
 
 import pytest
-from PySide6.QtCore import QMutex
+from PySide2.QtCore import QMutex
 
 import core.downscale as downscale
 from core.exceptions import CancellationException, FileException, GenericException

@@ -1,5 +1,5 @@
-from PySide6.QtCore import QUrl
-from PySide6.QtMultimedia import QSoundEffect
+from PySide2.QtCore import QUrl
+from PySide2.QtMultimedia import QSoundEffect
 
 from data.constants import FINISHED_SOUND_PATH
 

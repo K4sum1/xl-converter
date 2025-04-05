@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 from contextlib import ExitStack
 
 import pytest
-from PySide6.QtCore import QMutex
+from PySide2.QtCore import QMutex
 
 from core.proxy import Proxy
 from core.exceptions import FileException

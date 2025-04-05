@@ -1,5 +1,5 @@
-from PySide6.QtGui import QWheelEvent
-from PySide6.QtWidgets import QSpinBox, QDoubleSpinBox
+from PySide2.QtGui import QWheelEvent
+from PySide2.QtWidgets import QSpinBox, QDoubleSpinBox
 
 class SpinBox(QSpinBox):
     def wheelEvent(self, e: QWheelEvent) -> None:

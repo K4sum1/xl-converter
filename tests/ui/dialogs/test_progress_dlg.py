@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock, patch
 
 import pytest
-from PySide6.QtWidgets import QProgressDialog
+from PySide2.QtWidgets import QProgressDialog
 
 from ui.dialogs.progress_dlg import ProgressDialog
 

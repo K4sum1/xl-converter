@@ -2,8 +2,8 @@ import logging
 from unittest.mock import patch, MagicMock
 from contextlib import ExitStack
 
-from PySide6.QtWidgets import QWidget, QLabel, QComboBox
-from PySide6.QtCore import QUrl, QObject
+from PySide2.QtWidgets import QWidget, QLabel, QComboBox
+from PySide2.QtCore import QUrl, QObject
 import pytest
 
 import ui.lib.utils as utils
@@ -66,17 +66,17 @@ def test_setToolTip_invalid_widget_types(caplog, setToolTip_patches):
 def mock_environ():
     with patch("os.environ", {
         "LD_LIBRARY_PATH": "/opt/app/_internal",
-        "QT_PLUGIN_PATH": "/opt/app/_internal/PySide6/Qt/plugins",
+        "QT_PLUGIN_PATH": "/opt/app/_internal/PySide2/Qt/plugins",
         "QT_QPA_PLATFORM_PLUGIN_PATH": "/opt/app/_internal",
-        "QML2_IMPORT_PATH": "/opt/app/_internal/PySide6/Qt/qml",
+        "QML2_IMPORT_PATH": "/opt/app/_internal/PySide2/Qt/qml",
     }) as mock_env:
         yield mock_env
 
 def test__sanitizeEnviron(mock_environ):
     assert mock_environ["LD_LIBRARY_PATH"] == "/opt/app/_internal"
-    assert mock_environ["QT_PLUGIN_PATH"] == "/opt/app/_internal/PySide6/Qt/plugins"
+    assert mock_environ["QT_PLUGIN_PATH"] == "/opt/app/_internal/PySide2/Qt/plugins"
     assert mock_environ["QT_QPA_PLATFORM_PLUGIN_PATH"] == "/opt/app/_internal"
-    assert mock_environ["QML2_IMPORT_PATH"] == "/opt/app/_internal/PySide6/Qt/qml"
+    assert mock_environ["QML2_IMPORT_PATH"] == "/opt/app/_internal/PySide2/Qt/qml"
 
     with utils._sanitizeEnviron():
         assert "LD_LIBRARY_PATH" not in mock_environ
@@ -85,9 +85,9 @@ def test__sanitizeEnviron(mock_environ):
         assert "QML2_IMPORT_PATH" not in mock_environ
 
     assert mock_environ["LD_LIBRARY_PATH"] == "/opt/app/_internal"
-    assert mock_environ["QT_PLUGIN_PATH"] == "/opt/app/_internal/PySide6/Qt/plugins"
+    assert mock_environ["QT_PLUGIN_PATH"] == "/opt/app/_internal/PySide2/Qt/plugins"
     assert mock_environ["QT_QPA_PLATFORM_PLUGIN_PATH"] == "/opt/app/_internal"
-    assert mock_environ["QML2_IMPORT_PATH"] == "/opt/app/_internal/PySide6/Qt/qml"
+    assert mock_environ["QML2_IMPORT_PATH"] == "/opt/app/_internal/PySide2/Qt/qml"
 
 def test_openRemoteUrl():
     with patch("ui.lib.utils.openUrl") as mock_openUrl:

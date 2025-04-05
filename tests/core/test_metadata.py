@@ -1,7 +1,7 @@
 from unittest.mock import patch, MagicMock
 
 import pytest
-from PySide6.QtCore import (
+from PySide2.QtCore import (
     QMutexLocker,
     QMutex,
 )

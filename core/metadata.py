@@ -3,7 +3,7 @@ import tempfile
 import os
 import logging
 
-from PySide6.QtCore import (
+from PySide2.QtCore import (
     QMutexLocker,
     QMutex,
 )

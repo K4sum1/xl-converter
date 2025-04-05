@@ -2,7 +2,7 @@ from unittest.mock import patch, MagicMock
 import json
 
 import pytest
-from PySide6.QtWidgets import (
+from PySide2.QtWidgets import (
     QApplication,
     QWidget,
     QLabel,

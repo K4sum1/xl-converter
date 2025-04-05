@@ -4,18 +4,18 @@ import sys
 import os
 import logging
 
-from PySide6.QtWidgets import (
+from PySide2.QtWidgets import (
     QApplication,
     QMainWindow,
+    QShortcut,
     QTabWidget,
 )
-from PySide6.QtCore import (
+from PySide2.QtCore import (
     QThreadPool,
     Signal,
 )
-from PySide6.QtGui import (
+from PySide2.QtGui import (
     QIcon,
-    QShortcut,
     QKeySequence,
 )
 
@@ -206,4 +206,4 @@ if __name__ == "__main__":
     main_window.show()
     if res_evt := cli_args.getArgsLocalResQDropEvent():
         main_window.dropEvent(res_evt)
-    sys.exit(app.exec())
+    sys.exit(app.exec_())
