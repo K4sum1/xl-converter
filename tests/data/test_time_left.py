@@ -2,18 +2,17 @@ from unittest.mock import patch, MagicMock
 
 import pytest
 from PySide2.QtCore import QObject, QTimer, Slot
-#from PySide2.QtTest import QSignalSpy
 
 from data.time_left import TimeLeft
 
 class SignalCatcher(QObject):
     def __init__(self):
         super().__init__()
-        self.signal_emitted = False
+        self.signal_emitted = []
 
-    @Slot()
-    def on_signal(self):
-        self.signal_emitted = True
+    @Slot(str)
+    def on_signal(self, value):
+        self.signal_emitted.append(value)
 
 @pytest.fixture
 def time_left():
@@ -97,18 +96,20 @@ def test__updateEstimation_setup_error(caplog, time_left):
 
 def test__emitEstimationUpdated_started(time_left):
     time_left._formatOutput = MagicMock(return_value="100 s left")
-    spy = QSignalSpy(time_left.update_time_left)
+    catcher = SignalCatcher()
+    time_left.update_time_left.connect(catcher.on_signal)
     time_left.est_time_left_s = 100
 
     time_left._emitEstimationUpdated()
 
     time_left._formatOutput.assert_called_once_with(100)
-    assert spy.at(0)[0] == "100 s left"
+    assert catcher.signal_emitted[0] == "100 s left"
 
 def test__emitEstimationUpdated_not_started(time_left):
-    spy = QSignalSpy(time_left.update_time_left)
+    catcher = SignalCatcher()
+    time_left.update_time_left.connect(catcher.on_signal)
     time_left._emitEstimationUpdated()
-    assert spy.at(0)[0] == "Calculating time left..."
+    assert catcher.signal_emitted[0] == "Calculating time left..."
 
 def test__updateEstimationTimer(time_left):
     time_left._updateEstimation = MagicMock()

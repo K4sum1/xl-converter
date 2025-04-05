@@ -8,12 +8,38 @@ from PySide2.QtCore import (
     QThreadPool,
     Slot,
 )
-#from PySide2.QtTest import QSignalSpy
 
 from core.controller import Controller, CheckFlags, CheckStatus
 from core.worker import Worker
 
 class SignalCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = False
+
+    @Slot()
+    def on_signal(self):
+        self.signal_emitted = True
+
+class UpdateProgressLine1Catcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = []
+
+    @Slot(str)
+    def on_signal(self, value):
+        self.signal_emitted.append(value)
+
+class UpdateProgressValueCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = []
+
+    @Slot(int)
+    def on_signal(self, value):
+        self.signal_emitted.append(value)
+
+class ProcessingStartedCatcher(QObject):
     def __init__(self):
         super().__init__()
         self.signal_emitted = False
@@ -151,8 +177,10 @@ def test_parseData(controller):
         mock_parseData.assert_called_once_with(*items)
 
 def test_startProcessing(controller, output_tab_settings, modify_tab_settings, settings_tab_settings):
-    processing_started_spy = QSignalSpy(controller.processing_started)
-    update_progress_line1_spy = QSignalSpy(controller.update_progress_line1)
+    processing_started_catcher = ProcessingStartedCatcher()
+    controller.processing_started.connect(processing_started_catcher.on_signal)
+    update_progress_line1_catcher = UpdateProgressLine1Catcher()
+    controller.update_progress_line1.connect(update_progress_line1_catcher.on_signal)
 
     with \
         patch.object(controller.thread_manager, "configure") as mock_configure, \
@@ -207,11 +235,12 @@ def test_startProcessing(controller, output_tab_settings, modify_tab_settings, s
         assert mock_worker.return_value.signals.canceled.connect.call_count == 100
         assert mock_worker.return_value.signals.exception.connect.call_count == 100
         assert mock_threadpool_start.call_count == 100
-        assert processing_started_spy.count() == 1
-        assert update_progress_line1_spy.at(0)[0] == "Starting the conversion..."
+        assert processing_started_catcher.signal_emitted
+        assert update_progress_line1_catcher.signal_emitted[0] == "Starting the conversion..."
 
 def test_finishProcessing_happy_path(controller):
-    processing_finished_spy = QSignalSpy(controller.processing_finished)
+    catcher = SignalCatcher()
+    controller.processing_finished.connect(catcher.on_signal)
     with \
         patch.object(controller.time_left, "stopCounting") as mock_stopCounting, \
         patch("core.controller.ProcessManager.clear") as mock_ProcessManager_clear:
@@ -221,15 +250,16 @@ def test_finishProcessing_happy_path(controller):
         mock_stopCounting.assert_called_once()
         mock_ProcessManager_clear.assert_called_once()
         assert controller.finish_emitted
-        assert processing_finished_spy.count() == 1
+        assert catcher.signal_emitted
 
 def test_finishProcessing_sad_path(controller):
-    processing_finished_spy = QSignalSpy(controller.processing_finished)
+    catcher = SignalCatcher()
+    controller.processing_finished.connect(catcher.on_signal)
     controller.finish_emitted = True
 
     controller.finishProcessing()
 
-    assert processing_finished_spy.count() == 0
+    assert catcher.signal_emitted == 0
 
 def test_getItemCount(controller):
     with patch.object(controller.items, "getItemCount", return_value=100):
@@ -257,9 +287,15 @@ def test_workerStarted(controller, caplog):
 @pytest.fixture
 def workerCompleted_patched(controller):
     signal_spies = {
-        "update_progress_line1": QSignalSpy(controller.update_progress_line1),
-        "update_progress_value": QSignalSpy(controller.update_progress_value),
+        "update_progress_line1": UpdateProgressLine1Catcher(),
+        "update_progress_value": UpdateProgressValueCatcher(),
     }
+
+    signal_spies["update_progress_line1"].signal_emitted = []
+    signal_spies["update_progress_value"].signal_emitted = []
+
+    controller.update_progress_line1.connect(signal_spies["update_progress_line1"].on_signal)
+    controller.update_progress_value.connect(signal_spies["update_progress_value"].on_signal)
 
     patches = {
         "items_addCompletedItem": patch.object(controller.items, "addCompletedItem"),
@@ -283,8 +319,8 @@ def assert_workerCompleted(workerCompleted_patched, caplog, assert_addCompletedI
         mocks["time_left_addCompletedItem"].assert_called_once()
     if assert_addSkippedItem:
         mocks["time_left_addSkippedItem"].assert_called_once()
-    assert signal_spies["update_progress_line1"].at(0)[0] == f"Converted {mocks['items_getCompletedItemCount'].return_value} out of {mocks['items_getItemCount'].return_value} images"
-    assert signal_spies["update_progress_value"].at(0)[0] == mocks['items_getCompletedItemCount'].return_value
+    assert signal_spies["update_progress_line1"].signal_emitted[0] == f"Converted {mocks['items_getCompletedItemCount'].return_value} out of {mocks['items_getItemCount'].return_value} images"
+    assert signal_spies["update_progress_value"].signal_emitted[0] == mocks['items_getCompletedItemCount'].return_value
     assert len(caplog.records) == 2
     assert caplog.records[0].message == f"Active Workers: {mocks['activeThreadCount'].return_value}"
     assert caplog.records[1].message == "[Worker #0] Completed"

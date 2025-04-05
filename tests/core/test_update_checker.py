@@ -3,7 +3,6 @@ import requests
 
 import pytest
 from PySide2.QtCore import QObject, Slot
-#from PySide2.QtTest import QSignalSpy
 
 from core.update_checker import (
     Worker,
@@ -13,6 +12,55 @@ from core.update_checker import (
 from data.constants import VERSION, UPDATE_CHECKER_VER_FILE_URL
 
 class SignalCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = False
+        self.error_messages = []
+
+    @Slot()
+    def on_signal(self):
+        self.signal_emitted = True
+
+    @Slot(str)
+    def on_error(self, message):
+        self.signal_emitted = True
+        self.error_messages.append(message)
+
+class StatusCodeErrorCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = False
+        self.status_code = None
+
+    @Slot(int)
+    def on_signal(self, code):
+        self.signal_emitted = True
+        self.status_code = code
+
+
+class MiscErrorCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = False
+        self.error_message = None
+
+    @Slot(str)
+    def on_signal(self, message):
+        self.signal_emitted = True
+        self.error_message = message
+
+class JsonCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = False
+        self.json_data = None
+
+    @Slot(dict)
+    def on_signal(self, data):
+        self.signal_emitted = True
+        self.json_data = data
+
+class FinishedCatcher(QObject):
     def __init__(self):
         super().__init__()
         self.signal_emitted = False
@@ -33,72 +81,82 @@ def runner():
 
 def test_worker_simulate_server(worker):
     with patch("core.update_checker.SIMULATE_SERVER", True):
-        json_spy = QSignalSpy(worker.json)
-        finished_spy = QSignalSpy(worker.finished)
+        json_catcher = JsonCatcher()
+        finished_catcher = FinishedCatcher()
+        worker.json.connect(json_catcher.on_signal)
+        worker.finished.connect(finished_catcher.on_signal)
 
         worker.run()
     
         try:
-            assert json_spy.at(0)[0] == SIMULATE_SERVER_JSON
+            assert json_catcher.json_data == SIMULATE_SERVER_JSON
         except:
             pytest.fail("QSignalSpy instance error")
-        assert json_spy.count() == 1
-        assert finished_spy.count() == 1
+        assert json_catcher.signal_emitted
+        assert finished_catcher.signal_emitted
 
 def test_worker_connection_success(worker, requests_mock):
     tmp = {"latest_version": VERSION}
     requests_mock.get(UPDATE_CHECKER_VER_FILE_URL, json=tmp, status_code=200)
-    json_spy = QSignalSpy(worker.json)
-    finished_spy = QSignalSpy(worker.finished)
+    json_catcher = JsonCatcher()
+    finished_catcher = FinishedCatcher()
+    worker.json.connect(json_catcher.on_signal)
+    worker.finished.connect(finished_catcher.on_signal)
 
     worker.run()
 
     try:
-        assert json_spy.at(0)[0] == tmp
+        assert json_catcher.json_data == tmp
     except:
         pytest.fail("QSignalSpy instance error")
-    assert json_spy.count() == 1
-    assert finished_spy.count() == 1
+    assert json_catcher.signal_emitted
+    assert finished_catcher.signal_emitted
 
 def test_worker_connection_failed(worker, requests_mock, caplog):
     requests_mock.get(UPDATE_CHECKER_VER_FILE_URL, exc=requests.ConnectionError("No internet connection"))
-    misc_spy = QSignalSpy(worker.misc_error)
-    finished_spy = QSignalSpy(worker.finished)
-    
+    misc_error_catcher = MiscErrorCatcher()
+    finished_catcher = FinishedCatcher()
+    worker.misc_error.connect(misc_error_catcher.on_signal)
+    worker.finished.connect(finished_catcher.on_signal)
+
     worker.run()
 
     try:
-        assert misc_spy.at(0)[0] == "Couldn't connect to the server."
+        assert misc_error_catcher.error_message == "Couldn't connect to the server."
     except:
         pytest.fail("QSignalSpy instance error")
     assert "No internet connection" in caplog.text
-    assert finished_spy.count() == 1
+    assert finished_catcher.signal_emitted
 
 def test_worker_status_code_error(worker, requests_mock):
     requests_mock.get(UPDATE_CHECKER_VER_FILE_URL, json={}, status_code=404)
-    status_code_error_spy = QSignalSpy(worker.status_code_error)
-    finished_spy = QSignalSpy(worker.finished)
+    status_code_error_catcher = StatusCodeErrorCatcher()
+    finished_catcher = FinishedCatcher()
+    worker.status_code_error.connect(status_code_error_catcher.on_signal)
+    worker.finished.connect(finished_catcher.on_signal)
 
     worker.run()
 
     try:
-        assert status_code_error_spy.at(0)[0] == 404
+        assert status_code_error_catcher.status_code == 404
     except:
         pytest.fail("QSignalSpy instance error")
-    assert finished_spy.count() == 1
+    assert finished_catcher.signal_emitted
 
 def test_worker_parse_json_failed(worker, requests_mock):
     requests_mock.get(UPDATE_CHECKER_VER_FILE_URL, json=None, status_code=200)
-    misc_error_spy = QSignalSpy(worker.misc_error)
-    finished_spy = QSignalSpy(worker.finished)
+    misc_error_catcher = MiscErrorCatcher()
+    finished_catcher = FinishedCatcher()
+    worker.misc_error.connect(misc_error_catcher.on_signal)
+    worker.finished.connect(finished_catcher.on_signal)
 
     worker.run()
 
     try:
-        assert misc_error_spy.at(0)[0] == "Parsing JSON failed."
+        assert misc_error_catcher.error_message == "Parsing JSON failed."
     except:
         pytest.fail("QSignalSpy instance error")
-    assert finished_spy.count() == 1
+    assert finished_catcher.signal_emitted
     
 @patch("core.update_checker.Worker")
 @patch("core.update_checker.QThread")
@@ -117,26 +175,28 @@ def test_runner_run(mock_qthread, mock_worker, runner):
     thread_instance.start.assert_called_once()
 
 def test_runner_handleErrorStatusCode(runner):
-    error_spy = QSignalSpy(runner.error)
-    
+    catcher = SignalCatcher()
+    runner.error.connect(catcher.on_error)
+
     runner.handleErrorStatusCode(404)
     runner.handleErrorStatusCode(500)
     runner.handleErrorStatusCode(123)
-    
+
     try:
-        assert error_spy.at(0)[0] == "Version file not found."
-        assert error_spy.at(1)[0] == "Internal server error."
-        assert error_spy.at(2)[0] == "Error, status code: 123"
+        assert catcher.error_messages[0] == "Version file not found."
+        assert catcher.error_messages[1] == "Internal server error."
+        assert catcher.error_messages[2] == "Error, status code: 123"
     except:
         pytest.fail("QSignalSpy instance error")
 
 def test_runner_handleError(runner):
-    error_spy = QSignalSpy(runner.error)
+    catcher = SignalCatcher()
+    runner.error.connect(catcher.on_error)
 
     runner.handleError("Custom error.")
 
     try:
-        assert error_spy.at(0)[0] == "Custom error."
+        assert catcher.error_messages[0] == "Custom error."
     except:
         pytest.fail("QSignalSpy instance error")
 
@@ -160,8 +220,9 @@ def test_runner_handleFinish(mock_qthread, mock_worker, runner):
     assert runner.worker is None
 
 def test_runner_handleFinish_not_started(runner):
-    finished_spy = QSignalSpy(runner.finished)
+    catcher = SignalCatcher()
+    runner.finished.connect(catcher.on_signal)
 
     runner.handleFinish()
     
-    assert finished_spy.count() == 1
+    assert catcher.signal_emitted
