@@ -4,7 +4,6 @@ from contextlib import ExitStack, contextmanager
 
 import pytest
 from PySide2.QtCore import QMutex, QObject, Slot
-#from PySide2.QtTest import QSignalSpy
 
 from core.worker import Worker
 from core.proxy import Proxy
@@ -18,6 +17,21 @@ class SignalCatcher(QObject):
     @Slot()
     def on_signal(self):
         self.signal_emitted = True
+
+class ExceptionCatcher(QObject):
+    def __init__(self):
+        super().__init__()
+        self.signal_emitted = []
+        self.id_str = None
+        self.msg = None
+        self.source = None
+
+    @Slot(str, str, str)
+    def on_signal(self, id_str, msg, source):
+        self.signal_emitted.append((id_str, msg, source))
+        self.id_str = id_str
+        self.msg = msg
+        self.source = source
 
 @pytest.fixture
 def worker():
@@ -117,24 +131,27 @@ def test_logException(worker):
     id_str, msg, source = "ID0", "Exception", str(Path("/test/path/image.png"))
 
     worker.org_item_abs_path = source
-    spy = QSignalSpy(worker.signals.exception)
+    catcher = ExceptionCatcher()
+    worker.signals.exception.connect(catcher.on_signal)
     worker.logException(id_str, msg)
 
-    assert spy.at(0)[0] == id_str
-    assert spy.at(0)[1] == msg
-    assert spy.at(0)[2] == source
+    assert catcher.id_str == id_str
+    assert catcher.msg == msg
+    assert catcher.source == source
 
 @patch("core.worker.task_status.wasCanceled", return_value=True)
 def test_run_canceled(mock_wasCanceled, worker):
-    spy_canceled = QSignalSpy(worker.signals.canceled)
+    catcher = SignalCatcher()
+    worker.signals.canceled.connect(catcher.on_signal)
     worker.run()
-    assert spy_canceled.count() == 1
+    assert catcher.signal_emitted
 
 @patch("core.worker.task_status.wasCanceled", return_value=False)
 def test_run_started(mock_wasCanceled, worker):
-    spy_started = QSignalSpy(worker.signals.started)
+    catcher = SignalCatcher()
+    worker.signals.started.connect(catcher.on_signal)
     worker.run()
-    assert spy_started.count() == 1
+    assert catcher.signal_emitted
 
 @patch("core.worker.os.path.isfile", return_value=False)
 def test_runChecks_file_not_found(mock_isfile, worker):

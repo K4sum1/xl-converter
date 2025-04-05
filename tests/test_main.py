@@ -5,7 +5,6 @@ from contextlib import ExitStack
 from PySide2.QtWidgets import QWidget, QTabWidget
 from PySide2.QtCore import QThreadPool, QMimeData, QObject, QPoint, Slot
 from PySide2.QtGui import QCloseEvent, QDragEnterEvent, QDropEvent, QMoveEvent
-#from PySide2.QtTest import QSignalSpy
 
 from main import MainWindow
 from core.controller import CheckStatus, CheckFlags
@@ -348,7 +347,9 @@ def test_dropEvent(has_urls, main_window_patched):
 
 def test_moveEvent(main_window):
     catcher = SignalCatcher()
+
     main_window.moved.connect(catcher.on_signal)
+
     # emit the signal
     main_window.moved.emit()
     assert catcher.signal_emitted
