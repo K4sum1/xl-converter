@@ -2,6 +2,7 @@ import unittest
 import sys
 import shutil
 import hashlib
+from time import sleep
 from pathlib import Path
 import platform
 from unittest.mock import patch
@@ -59,9 +60,6 @@ def blake2(path):
     
     return hasher.hexdigest()
 
-def sleep(ms):
-    QTest.qWait(ms)
-    
 def test_dict(data):
     """Recursively verify dictionary's integrity"""
     for key, value in data.items():
@@ -204,7 +202,7 @@ class Interact:
 
     def wait_for_done(self):
         while True:
-            sleep(100)
+            sleep(0.1)
             if self.main_window.controller.getCompletedItemCount() == self.main_window.controller.getItemCount():
                 break
 
@@ -232,7 +230,7 @@ class Interact:
         QTest.mousePress(self.main_window, Qt.LeftButton, pos=QPoint(), delay=100)
         self.main_window.dropEvent(drop_event)
         QTest.mouseRelease(self.main_window, Qt.LeftButton, pos=QPoint(), delay=100)
-        QTest.qWait(100)
+        sleep(0.1)
     
     def get_settings(self, tab):
         if tab == "output_tab":
