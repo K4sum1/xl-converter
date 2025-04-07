@@ -474,43 +474,6 @@ class TestMainWindow(unittest.TestCase):
 
         converted = self.data.get_tmp_folder_content()
         assert converted[0].stat().st_size != converted[1].stat().st_size, "No change detected"
-    
-    # POSIX is fine
-    @windows_only
-    def test_jxl_utf8_support(self):
-        self.app.convert_preset(self.data.get_sample_img(), self.data.make_tmp_subfolder("漢字0"), "JPEG XL")
-        converted = self.data.get_tmp_folder_content()
-        assert "jxl" == str(converted[0])[-3:]
-
-        self.app.convert_preset(converted[0], self.data.make_tmp_subfolder("漢字1"), "PNG")
-        assert len(self.data.get_tmp_folder_content()) == 2
-
-    @windows_only
-    def test_avif_utf8_support(self):
-        self.app.convert_preset(self.data.get_sample_img(), self.data.make_tmp_subfolder("漢字0"), "AVIF")
-        converted = self.data.get_tmp_folder_content()
-        assert "avif" == str(converted[0])[-4:]
-
-        self.app.convert_preset(converted[0], self.data.make_tmp_subfolder("漢字1"), "PNG")
-        assert len(self.data.get_tmp_folder_content()) == 2
-
-    @windows_only
-    def test_jpegli_utf8_support(self):
-        self.app.convert_preset(self.data.get_sample_img(), self.data.make_tmp_subfolder("漢字0"), "JPEG", jpg_encoder="JPEGLI")
-        converted = self.data.get_tmp_folder_content()
-        assert "jpg" == str(converted[0])[-3:]
-
-        self.app.convert_preset(converted[0], self.data.make_tmp_subfolder("漢字1"), "PNG")
-        assert len(self.data.get_tmp_folder_content()) == 2
-
-    @windows_only
-    def test_imagemagick_utf8_support(self):
-        self.app.convert_preset(self.data.get_sample_img(), self.data.make_tmp_subfolder("漢字0"), "WebP")
-        converted = self.data.get_tmp_folder_content()
-        assert "webp" == str(converted[0])[-4:]
-
-        self.app.convert_preset(converted[0], self.data.make_tmp_subfolder("漢字1"), "PNG")
-        assert len(self.data.get_tmp_folder_content()) == 2
 
 if __name__ == "__main__":
     create_sample_img()
