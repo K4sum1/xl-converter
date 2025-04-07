@@ -131,7 +131,7 @@ Clone PyInstaller.
 
 ```cmd
 env_build\Scripts\activate
-git clone -b v6.11.1 --depth 1 https://github.com/pyinstaller/pyinstaller.git misc\pyinstaller
+git clone -b 6.1.0 --depth 1 https://github.com/K4sum1/pyinstaller.git misc\pyinstaller
 ```
 
 Recompile the bootloader.
