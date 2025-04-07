@@ -203,6 +203,7 @@ class Interact:
     def wait_for_done(self):
         while self.main_window.controller.getCompletedItemCount()!= self.main_window.controller.getItemCount():
             QApplication.processEvents()
+            sleep(0.1)
 
     def set_effort(self, effort):
         self.main_window.output_tab.effort_sb.setValue(effort)
@@ -221,7 +222,7 @@ class Interact:
 
     def drag_and_drop(self, urls):
         mime_data = QMimeData()
-        mime_data.setUrls([QUrl.fromLocalFile(url) for url in urls])
+        mime_data.setUrls([QUrl.fromLocalFile(str(url)) for url in urls])
 
         drop_event = QDropEvent(QPoint(), Qt.CopyAction, mime_data, Qt.LeftButton, Qt.NoModifier)
 
