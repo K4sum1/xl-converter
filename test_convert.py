@@ -201,10 +201,8 @@ class Interact:
         self.wait_for_done()
 
     def wait_for_done(self):
-        while True:
-            sleep(0.1)
-            if self.main_window.controller.getCompletedItemCount() == self.main_window.controller.getItemCount():
-                break
+        while self.main_window.controller.getCompletedItemCount()!= self.main_window.controller.getItemCount():
+            QApplication.processEvents()
 
     def set_effort(self, effort):
         self.main_window.output_tab.effort_sb.setValue(effort)
